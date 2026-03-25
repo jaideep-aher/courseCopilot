@@ -1,0 +1,31 @@
+# Course Co-Pilot Dependencies
+
+# FastAPI & Server
+fastapi
+uvicorn[standard]
+python-multipart
+
+# Data Processing
+pandas
+numpy
+
+# LLM Integration
+openai
+
+# PDF Processing
+pdfplumber
+pdf2image
+
+# Web Search Agent
+duckduckgo-search
+beautifulsoup4
+requests
+
+# ML / Matching
+sentence-transformers
+scikit-learn
+
+# Environment & Config
+python-dotenv
+pydantic
+pydantic-settings

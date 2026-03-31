@@ -45,7 +45,7 @@ class Settings(BaseSettings):
     research_delay_seconds: float = 1.0  # Delay between research calls
 
     model_config = ConfigDict(
-        env_file=".env",
+        env_file=os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env"),
         env_file_encoding="utf-8",
         extra="ignore",  # Ignore extra fields from .env (old LLM settings)
     )

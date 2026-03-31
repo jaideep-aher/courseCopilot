@@ -691,7 +691,11 @@ async def pipeline_transcript_evaluate_stream(
 
         await task
 
-    return StreamingResponse(event_stream(), media_type="text/event-stream")
+    return StreamingResponse(
+        event_stream(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
 
 
 @app.delete("/pipeline/cache", tags=["Pipeline"])

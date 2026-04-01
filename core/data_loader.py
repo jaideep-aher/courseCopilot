@@ -40,6 +40,13 @@ class CourseDataLoader:
         
         return text if text else None
     
+    def _clean_link(self, text: Optional[str]) -> Optional[str]:
+        """Clean a URL/link field (preserves the URL itself)."""
+        if pd.isna(text) or text == "..." or text == "":
+            return None
+        text = str(text).strip()
+        return text if text else None
+
     def _extract_course_code(self, title: str) -> Optional[str]:
         """Extract course code from title (e.g., 'AAS 2320' from 'AAS 2320 Intro To...')"""
         match = re.match(r'^([A-Z]{2,4}\s*\d{3,4}[A-Z]?)', title)
@@ -82,6 +89,8 @@ class CourseDataLoader:
                 grading_scale=self._clean_text(row.get('grading_scale')),
                 assignments_summary=self._clean_text(row.get('assignments_summary')),
                 weekly_schedule=self._clean_text(row.get('weekly_schedule_highlights')),
+                source_link=self._clean_link(row.get('source_link')),
+                data_source=self._clean_text(row.get('data_source')),
             )
 
             # Extract course code

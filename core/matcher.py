@@ -29,6 +29,7 @@ class SimilarityMatcher:
             semantic_weight=settings.semantic_weight,
             keyword_weight=settings.keyword_weight,
             knowledge_points_weight=settings.knowledge_points_weight,
+            description_overlap_weight=settings.description_overlap_weight,
             structural_weight=settings.structural_weight,
         )
         self.top_n = settings.top_n_matches
@@ -63,11 +64,12 @@ class SimilarityMatcher:
             category=course.category,
             course_code=course.course_code or "",
             main_topics=topics[:10] if topics else [],
-            learning_outcomes=[],  # Not used in local matcher
+            learning_outcomes=[],
             key_concepts=topics[10:20] if len(topics) > 10 else [],
             course_level=course_level,
             prerequisites=course.prerequisites or "",
             summary_text=course.course_description or "",
+            source_link=getattr(course, 'source_link', None),
             missing_fields=missing_fields,
         )
 
@@ -123,9 +125,11 @@ class SimilarityMatcher:
             # Generate evaluation notes
             if matches:
                 best_score = matches[0].similarity_score
-                if best_score >= 0.8:
+                if best_score >= 0.85:
+                    eval_notes = f"Excellent match found with {int(best_score * 100)}% similarity. Very high confidence in equivalency."
+                elif best_score >= 0.70:
                     eval_notes = f"Strong match found with {int(best_score * 100)}% similarity. High confidence in equivalency."
-                elif best_score >= 0.6:
+                elif best_score >= 0.55:
                     eval_notes = f"Moderate matches found. Review recommended for partial credit consideration."
                 else:
                     eval_notes = f"Limited similarity detected. May not qualify for direct equivalency."

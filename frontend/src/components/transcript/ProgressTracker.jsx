@@ -1,73 +1,73 @@
 const STAGES = [
-  { key: 'parsing', label: 'Parsing Transcript' },
-  { key: 'researching_source', label: 'Researching Source Courses' },
-  { key: 'researching_target', label: 'Researching Target Courses' },
-  { key: 'matching', label: 'Running Similarity Analysis' },
+  { key: 'parsing', label: 'Parsing transcript' },
+  { key: 'researching_source', label: 'Researching source courses' },
+  { key: 'researching_target', label: 'Researching target courses' },
+  { key: 'matching', label: 'Similarity analysis' },
 ]
 
 export default function ProgressTracker({ progress }) {
   if (!progress) return null
 
-  const currentIdx = STAGES.findIndex(s => s.key === progress.stage)
+  const currentIdx = STAGES.findIndex((s) => s.key === progress.stage)
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-      <h3 className="text-sm font-semibold text-slate-700 mb-4">Processing Progress</h3>
+    <div className="cc-card p-6 sm:p-8">
+      <h3 className="cc-title-3 font-display mb-6">Progress</h3>
 
-      {/* Stage steps */}
-      <div className="space-y-3 mb-4">
+      <div className="space-y-4 mb-6">
         {STAGES.map((stage, idx) => {
           const isComplete = idx < currentIdx
           const isCurrent = idx === currentIdx
-          const isPending = idx > currentIdx
 
           return (
-            <div key={stage.key} className="flex items-center gap-3">
-              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
-                isComplete ? 'bg-green-500 text-white' :
-                isCurrent ? 'bg-blue-500 text-white animate-pulse' :
-                'bg-slate-200 text-slate-400'
-              }`}>
-                {isComplete ? '\u2713' : idx + 1}
+            <div key={stage.key} className="flex items-center gap-4">
+              <div
+                className={`w-7 h-7 rounded-full flex items-center justify-center text-[13px] font-semibold shrink-0 ${
+                  isComplete
+                    ? 'bg-[#34c759] text-white'
+                    : isCurrent
+                      ? 'bg-[var(--cc-accent)] text-white'
+                      : 'bg-[var(--cc-fill)] text-[var(--cc-label-secondary)]'
+                }`}
+              >
+                {isComplete ? '✓' : idx + 1}
               </div>
 
-              <div className="flex-1 min-w-0">
-                <p className={`text-sm font-medium ${
-                  isComplete ? 'text-green-700' :
-                  isCurrent ? 'text-blue-700' :
-                  'text-slate-400'
-                }`}>
+              <div className="flex-1 min-w-0 flex items-center justify-between gap-3">
+                <p
+                  className={`text-[15px] font-medium ${
+                    isComplete
+                      ? 'text-[var(--cc-label)]'
+                      : isCurrent
+                        ? 'text-[var(--cc-accent)]'
+                        : 'text-[var(--cc-label-secondary)]'
+                  }`}
+                >
                   {stage.label}
                 </p>
+                {isCurrent && progress.total > 0 && (
+                  <span className="text-[13px] font-medium text-[var(--cc-label-secondary)] tabular-nums shrink-0">
+                    {progress.current}/{progress.total}
+                  </span>
+                )}
               </div>
-
-              {isCurrent && progress.total > 0 && (
-                <span className="text-xs font-medium text-blue-600 shrink-0">
-                  {progress.current}/{progress.total}
-                </span>
-              )}
             </div>
           )
         })}
       </div>
 
-      {/* Progress bar */}
       {progress.total > 0 && (
-        <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden mb-3">
+        <div className="h-1 bg-[var(--cc-fill)] rounded-full overflow-hidden mb-5">
           <div
-            className="h-full bg-blue-500 rounded-full transition-all duration-300"
+            className="h-full rounded-full bg-[var(--cc-accent)] transition-all duration-300"
             style={{ width: `${(progress.current / progress.total) * 100}%` }}
           />
         </div>
       )}
 
-      {/* Live status message — the key addition */}
       {progress.message && (
-        <div className="bg-slate-900 rounded-lg px-4 py-3 flex items-start gap-2">
-          <span className="text-blue-400 animate-pulse shrink-0 mt-0.5">&#9679;</span>
-          <p className="text-sm text-slate-300 font-mono leading-relaxed">
-            {progress.message}
-          </p>
+        <div className="rounded-[var(--cc-radius-md)] px-4 py-3 bg-[var(--cc-bg)] border border-[var(--cc-border)]">
+          <p className="text-[13px] text-[var(--cc-label-secondary)] font-mono leading-relaxed">{progress.message}</p>
         </div>
       )}
     </div>

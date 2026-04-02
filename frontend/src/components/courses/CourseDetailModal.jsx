@@ -19,27 +19,39 @@ export default function CourseDetailModal({ courseId, onClose }) {
   if (!courseId) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ background: 'rgba(0, 0, 0, 0.32)' }}
+      onClick={onClose}
+    >
       <div
-        className="bg-white rounded-xl shadow-xl max-w-2xl w-full mx-4 max-h-[85vh] overflow-y-auto"
+        className="cc-card max-w-2xl w-full max-h-[85vh] overflow-y-auto shadow-2xl"
+        style={{ borderRadius: '20px' }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between p-5 border-b border-slate-200">
-          <h2 className="text-lg font-semibold text-slate-900">Course Details</h2>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 text-2xl leading-none">
-            &times;
+        <div className="flex items-center justify-between p-5 sm:p-6 border-b border-[var(--cc-separator)]">
+          <h2 className="text-[19px] font-semibold text-[var(--cc-label)]">Course details</h2>
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-9 h-9 flex items-center justify-center rounded-full text-[var(--cc-label-secondary)] hover:bg-[var(--cc-fill)] text-xl leading-none"
+            aria-label="Close"
+          >
+            ×
           </button>
         </div>
 
         {loading ? (
-          <LoadingSpinner message="Loading course details..." />
+          <LoadingSpinner message="Loading…" />
         ) : !course ? (
-          <p className="p-6 text-slate-500">Course not found.</p>
+          <p className="p-8 cc-footnote text-center">Course not found.</p>
         ) : (
-          <div className="p-5 space-y-4">
+          <div className="p-5 sm:p-6 space-y-5">
             <div>
-              <h3 className="text-xl font-bold text-slate-900">{course.course_title}</h3>
-              <div className="flex gap-2 mt-2">
+              <h3 className="text-[22px] font-semibold text-[var(--cc-label)] leading-snug tracking-tight">
+                {course.course_title}
+              </h3>
+              <div className="flex flex-wrap gap-2 mt-3">
                 <Badge>{course.university}</Badge>
                 <Badge>{course.category?.replace(/_/g, ' ')}</Badge>
                 {course.course_code && <Badge variant="default">{course.course_code}</Badge>}
@@ -48,15 +60,18 @@ export default function CourseDetailModal({ courseId, onClose }) {
 
             {course.course_description && (
               <Section title="Description">
-                <p className="text-sm text-slate-600">{course.course_description}</p>
+                <p className="text-[15px] text-[var(--cc-label-secondary)] leading-relaxed">{course.course_description}</p>
               </Section>
             )}
 
             {course.knowledge_points && (
-              <Section title="Knowledge Points">
-                <div className="flex flex-wrap gap-1.5">
+              <Section title="Knowledge points">
+                <div className="flex flex-wrap gap-2">
                   {course.knowledge_points.split(';').map((kp, i) => (
-                    <span key={i} className="bg-blue-50 text-blue-700 text-xs px-2 py-1 rounded-md">
+                    <span
+                      key={i}
+                      className="text-[13px] px-2.5 py-1 rounded-full bg-[rgba(0,113,227,0.08)] text-[var(--cc-accent)]"
+                    >
                       {kp.trim()}
                     </span>
                   ))}
@@ -66,25 +81,27 @@ export default function CourseDetailModal({ courseId, onClose }) {
 
             {course.prerequisites && (
               <Section title="Prerequisites">
-                <p className="text-sm text-slate-600">{course.prerequisites}</p>
+                <p className="text-[15px] text-[var(--cc-label-secondary)] leading-relaxed">{course.prerequisites}</p>
               </Section>
             )}
 
             {course.textbooks_materials && (
-              <Section title="Textbooks & Materials">
-                <p className="text-sm text-slate-600">{course.textbooks_materials}</p>
+              <Section title="Textbooks & materials">
+                <p className="text-[15px] text-[var(--cc-label-secondary)] leading-relaxed">{course.textbooks_materials}</p>
               </Section>
             )}
 
             {course.instructor_name && (
               <Section title="Instructor">
-                <p className="text-sm text-slate-600">{course.instructor_name}</p>
+                <p className="text-[15px] text-[var(--cc-label-secondary)]">{course.instructor_name}</p>
               </Section>
             )}
 
             {course.grading_scale && (
               <Section title="Grading">
-                <p className="text-sm text-slate-600 whitespace-pre-wrap">{course.grading_scale}</p>
+                <p className="text-[15px] text-[var(--cc-label-secondary)] whitespace-pre-wrap leading-relaxed">
+                  {course.grading_scale}
+                </p>
               </Section>
             )}
           </div>
@@ -97,7 +114,9 @@ export default function CourseDetailModal({ courseId, onClose }) {
 function Section({ title, children }) {
   return (
     <div>
-      <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">{title}</h4>
+      <h4 className="text-[11px] font-semibold text-[var(--cc-label-secondary)] uppercase tracking-wide mb-2">
+        {title}
+      </h4>
       {children}
     </div>
   )

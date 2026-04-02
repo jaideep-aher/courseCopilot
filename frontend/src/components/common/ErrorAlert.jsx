@@ -1,15 +1,23 @@
 export default function ErrorAlert({ message, onDismiss }) {
   if (!message) return null
   return (
-    <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-      <div className="flex items-start justify-between">
-        <div className="flex items-start gap-2">
-          <span className="text-red-500 mt-0.5">&#x26A0;</span>
-          <p className="text-sm text-red-700">{message}</p>
-        </div>
+    <div
+      className="rounded-[var(--cc-radius-lg)] p-4 mb-4 border"
+      style={{
+        background: 'var(--cc-danger-bg)',
+        borderColor: 'rgba(255, 59, 48, 0.2)',
+      }}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <p className="text-[15px] text-[var(--cc-danger)] leading-snug">{message}</p>
         {onDismiss && (
-          <button onClick={onDismiss} className="text-red-400 hover:text-red-600 text-lg leading-none">
-            &times;
+          <button
+            type="button"
+            onClick={onDismiss}
+            className="shrink-0 text-[var(--cc-danger)] opacity-60 hover:opacity-100 text-xl leading-none px-1"
+            aria-label="Dismiss"
+          >
+            ×
           </button>
         )}
       </div>

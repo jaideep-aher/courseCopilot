@@ -4,23 +4,23 @@ export default function CategoryBreakdown({ byCategory, totalCourses }) {
   const entries = Object.entries(byCategory).sort((a, b) => b[1] - a[1])
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-      <h3 className="text-sm font-semibold text-slate-900 mb-4">Categories</h3>
+    <div className="cc-card p-6">
+      <h3 className="cc-title-3 font-display mb-5">Categories</h3>
       <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="w-full text-[15px]">
           <thead>
-            <tr className="border-b border-slate-200">
-              <th className="text-left py-2 text-slate-500 font-medium">Category</th>
-              <th className="text-right py-2 text-slate-500 font-medium">Count</th>
-              <th className="text-right py-2 text-slate-500 font-medium">%</th>
+            <tr className="border-b border-[var(--cc-separator)]">
+              <th className="text-left py-3 font-medium text-[var(--cc-label-secondary)]">Category</th>
+              <th className="text-right py-3 font-medium text-[var(--cc-label-secondary)]">Count</th>
+              <th className="text-right py-3 font-medium text-[var(--cc-label-secondary)]">%</th>
             </tr>
           </thead>
           <tbody>
             {entries.map(([cat, count]) => (
-              <tr key={cat} className="border-b border-slate-100 last:border-0">
-                <td className="py-2 text-slate-700">{cat.replace(/_/g, ' ')}</td>
-                <td className="py-2 text-right text-slate-600">{count}</td>
-                <td className="py-2 text-right text-slate-500">
+              <tr key={cat} className="border-b border-[var(--cc-border)] last:border-0">
+                <td className="py-3 text-[var(--cc-label)]">{cat.replace(/_/g, ' ')}</td>
+                <td className="py-3 text-right cc-footnote tabular-nums">{count}</td>
+                <td className="py-3 text-right cc-footnote tabular-nums">
                   {totalCourses ? Math.round((count / totalCourses) * 100) : 0}%
                 </td>
               </tr>

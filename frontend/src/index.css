@@ -1,7 +1,206 @@
 @import "tailwindcss";
 
+/* Apple-like system UI: SF on Apple, Segoe on Windows, Roboto on Android */
+:root {
+  --cc-bg: #f5f5f7;
+  --cc-surface: #ffffff;
+  --cc-surface-elevated: #ffffff;
+  --cc-label: #1d1d1f;
+  --cc-label-secondary: #86868b;
+  --cc-separator: rgba(60, 60, 67, 0.12);
+  --cc-border: rgba(60, 60, 67, 0.08);
+  --cc-fill: rgba(120, 120, 128, 0.12);
+  --cc-accent: #0071e3;
+  --cc-accent-hover: #0077ed;
+  --cc-accent-pressed: #006edb;
+  --cc-danger: #ff3b30;
+  --cc-danger-bg: rgba(255, 59, 48, 0.08);
+  --cc-radius-lg: 18px;
+  --cc-radius-md: 12px;
+  --cc-radius-sm: 10px;
+  --cc-shadow-card: 0 2px 12px rgba(0, 0, 0, 0.06);
+  --cc-shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --cc-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+}
+
 body {
   margin: 0;
-  background-color: #f8fafc;
+  background-color: var(--cc-bg);
   min-height: 100vh;
+  font-family: var(--cc-font);
+  font-size: 17px;
+  line-height: 1.47;
+  color: var(--cc-label);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.font-display {
+  font-family: var(--cc-font);
+  letter-spacing: -0.022em;
+}
+
+.cc-page-bg {
+  background-color: var(--cc-bg);
+}
+
+@layer components {
+  .cc-card {
+    background: var(--cc-surface);
+    border: 1px solid var(--cc-border);
+    border-radius: var(--cc-radius-lg);
+    box-shadow: var(--cc-shadow-card);
+  }
+
+  .cc-hero {
+    background: var(--cc-surface);
+    border: 1px solid var(--cc-border);
+    border-radius: calc(var(--cc-radius-lg) + 4px);
+    box-shadow: var(--cc-shadow-card);
+  }
+
+  .cc-input {
+    width: 100%;
+    min-height: 46px;
+    padding: 0 16px;
+    font-size: 17px;
+    line-height: 1.2;
+    border-radius: var(--cc-radius-md);
+    border: 1px solid var(--cc-separator);
+    background: var(--cc-surface);
+    color: var(--cc-label);
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .cc-input::placeholder {
+    color: var(--cc-label-secondary);
+  }
+
+  .cc-input:focus {
+    border-color: var(--cc-accent);
+    box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15);
+  }
+
+  .cc-input:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    background: var(--cc-bg);
+  }
+
+  .cc-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 48px;
+    padding: 0 24px;
+    font-size: 17px;
+    font-weight: 500;
+    line-height: 1;
+    color: #fff;
+    background: var(--cc-accent);
+    border: none;
+    border-radius: 980px;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease, opacity 0.15s ease;
+  }
+
+  .cc-btn-primary:hover:not(:disabled) {
+    background: var(--cc-accent-hover);
+  }
+
+  .cc-btn-primary:active:not(:disabled) {
+    background: var(--cc-accent-pressed);
+    transform: scale(0.98);
+  }
+
+  .cc-btn-primary:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .cc-btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 48px;
+    padding: 0 20px;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1;
+    color: var(--cc-accent);
+    background: transparent;
+    border: 1px solid var(--cc-separator);
+    border-radius: 980px;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+
+  .cc-btn-secondary:hover {
+    background: var(--cc-fill);
+    border-color: transparent;
+  }
+
+  .cc-nav-link {
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1;
+    color: var(--cc-label-secondary);
+    border-radius: 980px;
+    transition: color 0.15s ease, background 0.15s ease;
+  }
+
+  .cc-nav-link:hover {
+    color: var(--cc-label);
+    background: var(--cc-fill);
+  }
+
+  .cc-nav-link-active {
+    color: var(--cc-label);
+    background: var(--cc-fill);
+  }
+
+  .cc-link {
+    color: var(--cc-accent);
+    font-weight: 500;
+    text-decoration: none;
+    transition: opacity 0.15s ease;
+  }
+
+  .cc-link:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+  }
+
+  .cc-footnote {
+    font-size: 13px;
+    line-height: 1.38;
+    color: var(--cc-label-secondary);
+  }
+
+  .cc-large-title {
+    font-size: clamp(2rem, 5vw, 2.75rem);
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    line-height: 1.07;
+    color: var(--cc-label);
+  }
+
+  .cc-title-2 {
+    font-size: 1.375rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    color: var(--cc-label);
+  }
+
+  .cc-title-3 {
+    font-size: 1.0625rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--cc-label);
+  }
 }

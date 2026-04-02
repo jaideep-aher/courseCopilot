@@ -1,8 +1,11 @@
-export default function LoadingSpinner({ message = 'Loading...' }) {
+export default function LoadingSpinner({ message = 'Loading…' }) {
   return (
-    <div className="flex flex-col items-center justify-center py-12">
-      <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
-      <p className="mt-3 text-sm text-slate-500">{message}</p>
+    <div className="flex flex-col items-center justify-center py-16">
+      <div
+        className="w-8 h-8 rounded-full border-2 border-[var(--cc-fill)] border-t-[var(--cc-accent)] animate-spin"
+        aria-hidden
+      />
+      <p className="mt-5 cc-footnote">{message}</p>
     </div>
   )
 }

@@ -26,24 +26,28 @@ export default function CourseBrowserPage() {
   }, [courses, search])
 
   return (
-    <PageContainer title="Course Browser" subtitle="Browse and search all courses in the dataset">
+    <PageContainer
+      title="Course catalog"
+      subtitle="Inspect every row in the loaded dataset. Filter by institution or search across titles and codes."
+      breadcrumbs={[{ to: '/workbench', label: 'Workbench' }, { label: 'Catalog' }]}
+    >
       <div className="flex flex-col sm:flex-row gap-3 mb-6">
         <UniversityFilter value={university} onChange={setUniversity} />
         <input
-          type="text"
-          placeholder="Search by title, code, or category..."
+          type="search"
+          placeholder="Search title, code, or category…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="cc-input flex-1"
         />
-        <span className="text-sm text-slate-500 self-center">
-          {filtered.length} of {total} courses
+        <span className="cc-footnote self-center tabular-nums whitespace-nowrap font-medium">
+          {filtered.length} / {total}
         </span>
       </div>
 
       {error && <ErrorAlert message={error} />}
       {loading ? (
-        <LoadingSpinner message="Loading courses..." />
+        <LoadingSpinner message="Loading courses…" />
       ) : (
         <CourseTable courses={filtered} onViewCourse={setSelectedCourseId} />
       )}

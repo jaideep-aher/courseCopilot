@@ -19,26 +19,31 @@ export default function BatchEvaluationPage() {
 
   return (
     <PageContainer
-      title="Batch Evaluation"
-      subtitle="Evaluate multiple Houston courses against the Duke catalog at once"
+      title="Batch evaluation"
+      subtitle="Select multiple source catalog courses and evaluate them together against the Duke catalog."
+      breadcrumbs={[{ to: '/workbench', label: 'Workbench' }, { label: 'Batch' }]}
     >
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid lg:grid-cols-3 gap-8">
         <div>
           <CourseSelector selected={selected} onSelectionChange={setSelected} />
           <button
             onClick={handleRun}
             disabled={loading || selected.length === 0}
-            className="mt-4 w-full bg-blue-700 text-white py-2.5 px-4 rounded-lg text-sm font-medium hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="mt-5 w-full cc-btn-primary disabled:opacity-50"
           >
             {loading
-              ? `Evaluating ${selected.length} courses...`
-              : `Run Batch Evaluation (${selected.length} courses)`}
+              ? `Evaluating ${selected.length} courses…`
+              : `Run batch (${selected.length} courses)`}
           </button>
         </div>
 
         <div className="lg:col-span-2">
           {error && <ErrorAlert message={error} onDismiss={reset} />}
-          {loading && <LoadingSpinner message={`Evaluating ${selected.length} courses... This may take a moment.`} />}
+          {loading && (
+            <LoadingSpinner
+              message={`Evaluating ${selected.length} courses — this can take a little while.`}
+            />
+          )}
           {!loading && result && (
             <>
               <BatchSummary result={result} />
@@ -46,9 +51,9 @@ export default function BatchEvaluationPage() {
             </>
           )}
           {!loading && !result && !error && (
-            <div className="bg-white rounded-lg border border-dashed border-slate-300 p-12 text-center">
-              <p className="text-slate-400 text-sm">
-                Select Houston courses from the list and click "Run Batch Evaluation" to see results.
+            <div className="cc-card p-12 text-center" style={{ borderStyle: 'dashed' }}>
+              <p className="cc-footnote max-w-md mx-auto leading-relaxed">
+                Select courses from the list, then run the batch to see a summary table and per-course matches.
               </p>
             </div>
           )}

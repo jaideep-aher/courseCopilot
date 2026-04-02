@@ -33,45 +33,44 @@ export default function CourseSelector({ selected, onSelectionChange }) {
   const selectAll = () => onSelectionChange(courses.map((c) => c.id))
   const deselectAll = () => onSelectionChange([])
 
-  if (loading) return <LoadingSpinner message="Loading Houston courses..." />
+  if (loading) return <LoadingSpinner message="Loading courses…" />
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-5">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold text-slate-900">
-          Houston Courses ({selected.length} of {courses.length} selected)
+    <div className="cc-card p-5 sm:p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+        <h3 className="cc-title-3 font-display">
+          Houston courses · {selected.length} of {courses.length}
         </h3>
-        <div className="flex gap-2">
-          <button onClick={selectAll} className="text-xs text-blue-600 hover:text-blue-800 font-medium">
-            Select All
+        <div className="flex gap-4 text-[13px] font-medium">
+          <button type="button" onClick={selectAll} className="text-[var(--cc-accent)] hover:opacity-80">
+            Select all
           </button>
-          <span className="text-slate-300">|</span>
-          <button onClick={deselectAll} className="text-xs text-slate-500 hover:text-slate-700 font-medium">
-            Deselect All
+          <button type="button" onClick={deselectAll} className="text-[var(--cc-label-secondary)] hover:text-[var(--cc-label)]">
+            Clear
           </button>
         </div>
       </div>
 
-      <div className="max-h-96 overflow-y-auto space-y-4">
+      <div className="max-h-96 overflow-y-auto space-y-5 pr-1">
         {grouped.map(([category, catCourses]) => (
           <div key={category}>
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">
+            <p className="text-[11px] font-semibold text-[var(--cc-label-secondary)] uppercase tracking-wide mb-2">
               {category.replace(/_/g, ' ')}
             </p>
-            <div className="space-y-1">
+            <div className="space-y-0.5">
               {catCourses.map((c) => (
                 <label
                   key={c.id}
-                  className="flex items-center gap-2 py-1.5 px-2 rounded hover:bg-slate-50 cursor-pointer"
+                  className="flex items-center gap-3 py-2.5 px-2 rounded-[var(--cc-radius-md)] hover:bg-[var(--cc-bg)] cursor-pointer"
                 >
                   <input
                     type="checkbox"
                     checked={selected.includes(c.id)}
                     onChange={() => toggle(c.id)}
-                    className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                    className="rounded border-[var(--cc-separator)] w-4 h-4 accent-[var(--cc-accent)]"
                   />
-                  <span className="text-sm text-slate-700 truncate">
-                    {c.code && <span className="font-mono text-xs text-slate-500 mr-1">{c.code}</span>}
+                  <span className="text-[15px] text-[var(--cc-label)] truncate">
+                    {c.code && <span className="font-mono text-[13px] text-[var(--cc-label-secondary)] mr-2">{c.code}</span>}
                     {c.title}
                   </span>
                 </label>

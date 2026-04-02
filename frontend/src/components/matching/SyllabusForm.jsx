@@ -30,8 +30,8 @@ export default function SyllabusForm({ onSubmit, loading }) {
   const handleReset = () => setForm(initialForm)
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-      <h3 className="text-sm font-semibold text-slate-900 mb-4">Course Information</h3>
+    <form onSubmit={handleSubmit} className="cc-card p-6 sm:p-8">
+      <h3 className="cc-title-3 font-display mb-6">Course information</h3>
 
       <div className="space-y-4">
         <Field label="Course Title" required>
@@ -41,7 +41,7 @@ export default function SyllabusForm({ onSubmit, loading }) {
             value={form.course_title}
             onChange={update('course_title')}
             placeholder="e.g. Introduction to Data Science"
-            className="input-field"
+            className="cc-input"
           />
         </Field>
 
@@ -53,7 +53,7 @@ export default function SyllabusForm({ onSubmit, loading }) {
               value={form.source_university}
               onChange={update('source_university')}
               placeholder="Houston"
-              className="input-field"
+              className="cc-input"
             />
           </Field>
           <Field label="Target University">
@@ -61,7 +61,7 @@ export default function SyllabusForm({ onSubmit, loading }) {
               type="text"
               value={form.target_university}
               onChange={update('target_university')}
-              className="input-field bg-slate-50"
+              className="cc-input bg-[var(--cc-bg)]"
             />
           </Field>
         </div>
@@ -72,7 +72,7 @@ export default function SyllabusForm({ onSubmit, loading }) {
             value={form.course_code}
             onChange={update('course_code')}
             placeholder="e.g. CS 201"
-            className="input-field"
+            className="cc-input"
           />
         </Field>
 
@@ -82,7 +82,7 @@ export default function SyllabusForm({ onSubmit, loading }) {
             value={form.category}
             onChange={update('category')}
             placeholder="e.g. Computer Science, Biology"
-            className="input-field"
+            className="cc-input"
           />
         </Field>
 
@@ -92,7 +92,7 @@ export default function SyllabusForm({ onSubmit, loading }) {
             value={form.course_description}
             onChange={update('course_description')}
             placeholder="Brief description of the course content and goals..."
-            className="input-field"
+            className="cc-input min-h-[5.5rem] resize-y"
           />
         </Field>
 
@@ -102,7 +102,7 @@ export default function SyllabusForm({ onSubmit, loading }) {
             value={form.knowledge_points}
             onChange={update('knowledge_points')}
             placeholder="e.g. python; machine learning; statistics; data visualization"
-            className="input-field"
+            className="cc-input min-h-[4rem] resize-y"
           />
         </Field>
 
@@ -112,7 +112,7 @@ export default function SyllabusForm({ onSubmit, loading }) {
             value={form.prerequisites}
             onChange={update('prerequisites')}
             placeholder="e.g. Basic programming, Calculus I"
-            className="input-field"
+            className="cc-input"
           />
         </Field>
 
@@ -122,47 +122,23 @@ export default function SyllabusForm({ onSubmit, loading }) {
             value={form.textbooks_materials}
             onChange={update('textbooks_materials')}
             placeholder="e.g. Python for Data Analysis by Wes McKinney"
-            className="input-field"
+            className="cc-input"
           />
         </Field>
       </div>
 
-      <div className="flex gap-3 mt-6">
+      <div className="flex flex-col-reverse sm:flex-row gap-3 mt-6">
+        <button type="button" onClick={handleReset} className="cc-btn-secondary sm:px-5 py-2.5">
+          Reset
+        </button>
         <button
           type="submit"
           disabled={loading || !form.course_title.trim()}
-          className="flex-1 bg-blue-700 text-white py-2.5 px-4 rounded-lg text-sm font-medium hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="flex-1 cc-btn-primary py-2.5 disabled:opacity-50"
         >
-          {loading ? 'Analyzing...' : 'Find Matching Courses'}
-        </button>
-        <button
-          type="button"
-          onClick={handleReset}
-          className="px-4 py-2.5 rounded-lg text-sm font-medium border border-slate-300 text-slate-600 hover:bg-slate-50 transition-colors"
-        >
-          Reset
+          {loading ? 'Analyzing…' : 'Find matching courses'}
         </button>
       </div>
-
-      <style>{`
-        .input-field {
-          width: 100%;
-          border: 1px solid #cbd5e1;
-          border-radius: 0.5rem;
-          padding: 0.5rem 0.75rem;
-          font-size: 0.875rem;
-          color: #334155;
-          outline: none;
-          transition: border-color 0.15s, box-shadow 0.15s;
-        }
-        .input-field:focus {
-          border-color: #3b82f6;
-          box-shadow: 0 0 0 2px rgba(59,130,246,0.2);
-        }
-        .input-field::placeholder {
-          color: #94a3b8;
-        }
-      `}</style>
     </form>
   )
 }
@@ -170,12 +146,12 @@ export default function SyllabusForm({ onSubmit, loading }) {
 function Field({ label, required, hint, children }) {
   return (
     <div>
-      <label className="block text-xs font-medium text-slate-600 mb-1">
+      <label className="block text-[13px] font-medium text-[var(--cc-label-secondary)] mb-2">
         {label}
-        {required && <span className="text-red-500 ml-0.5">*</span>}
+        {required && <span className="text-[var(--cc-danger)] ml-0.5">*</span>}
       </label>
       {children}
-      {hint && <p className="text-xs text-slate-400 mt-1">{hint}</p>}
+      {hint && <p className="cc-footnote mt-1.5">{hint}</p>}
     </div>
   )
 }

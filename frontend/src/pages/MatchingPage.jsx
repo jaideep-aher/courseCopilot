@@ -15,24 +15,26 @@ export default function MatchingPage() {
 
   return (
     <PageContainer
-      title="Match a Course"
-      subtitle="Submit course information to find equivalent Duke courses"
+      title="Custom syllabus match"
+      subtitle="Enter course details manually when the class is not in the preloaded catalog."
+      breadcrumbs={[{ to: '/workbench', label: 'Workbench' }, { label: 'Custom syllabus' }]}
     >
-      <div className="grid lg:grid-cols-2 gap-6">
+      <div className="grid lg:grid-cols-2 gap-8">
         <div>
           <SyllabusForm onSubmit={handleSubmit} loading={loading} />
         </div>
         <div>
           {error && <ErrorAlert message={error} onDismiss={reset} />}
-          {loading && <LoadingSpinner message="Analyzing syllabus and finding matches..." />}
+          {loading && <LoadingSpinner message="Analyzing syllabus and finding matches…" />}
           {!loading && result && <MatchResultsList result={result} />}
           {!loading && !result && !error && (
-            <div className="bg-white rounded-lg border border-dashed border-slate-300 p-12 text-center">
-              <p className="text-slate-400 text-sm">
-                Fill in the course details and click "Find Matching Courses" to see results here.
+            <div className="cc-card p-12 text-center" style={{ borderStyle: 'dashed' }}>
+              <p className="cc-footnote text-[var(--cc-label)]">
+                Fill in the course details and tap Find matching courses to see results here.
               </p>
-              <p className="text-slate-300 text-xs mt-2">
-                Tip: Knowledge points have the highest impact on matching accuracy (35% weight).
+              <p className="cc-footnote mt-4 leading-relaxed">
+                Tip: knowledge points have strong weight in the local matcher — include outcomes and topics when
+                possible.
               </p>
             </div>
           )}

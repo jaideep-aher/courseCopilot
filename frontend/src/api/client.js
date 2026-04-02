@@ -1,9 +1,15 @@
 import axios from 'axios';
 
+// In production, VITE_API_URL is set to the Railway backend URL.
+// In dev, falls back to /api which is proxied by Vite to localhost:8000.
+const API_BASE = import.meta.env.VITE_API_URL || '/api';
+
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: API_BASE,
   timeout: 60000,
 });
+
+export { API_BASE };
 
 // General
 export const getHealth = () => api.get('/health').then(r => r.data);

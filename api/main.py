@@ -2,6 +2,10 @@
 Course Co-Pilot API
 FastAPI application for transfer credit evaluation
 """
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
@@ -89,18 +93,17 @@ async def startup_event():
     global similarity_engine, data_loader, pipeline
 
     try:
-        # Initialize similarity engine (uses local ML models)
-        similarity_engine = SimilarityEngine()
-        print("✓ In-house similarity engine initialized (no API keys required)")
-        print("✓ Using sentence-transformers + TF-IDF + knowledge-points + rule-based matching")
-
-        # Initialize OpenAI client for AI research agent
+        # Initialize OpenAI client (used for both scoring and research)
         openai_client = None
         if settings.openai_api_key:
             openai_client = openai.OpenAI(api_key=settings.openai_api_key)
-            print("✓ OpenAI client initialized for AI research agent")
+            print(f"✓ OpenAI client initialized (scoring model: {settings.scoring_model})")
         else:
-            print("  Note: OPENAI_API_KEY not set. Transcript pipeline will not work.")
+            print("  Warning: OPENAI_API_KEY not set. LLM scoring and transcript pipeline will not work.")
+
+        # Initialize similarity engine (LLM-based scoring)
+        similarity_engine = SimilarityEngine(openai_client)
+        print("✓ LLM similarity engine initialized")
 
         # Initialize on-demand pipeline
         pipeline = TransferPipeline(similarity_engine, catalog_cache, openai_client)
@@ -660,9 +663,10 @@ async def pipeline_transcript_evaluate_stream(
     async def event_stream():
         progress_queue: asyncio.Queue = asyncio.Queue()
 
-        async def progress_callback(stage, current, total, message):
+        async def progress_callback(agent, stage, current, total, message):
             await progress_queue.put({
                 "type": "progress",
+                "agent": agent,
                 "stage": stage,
                 "current": current,
                 "total": total,

@@ -1,7 +1,9 @@
 """
 On-demand transfer credit evaluation pipeline.
 
-Orchestrates: source course parsing -> target catalog fetching -> matching -> recommendations.
+Orchestrates a multi-agent system:
+  OrchestratorAgent coordinates ParserAgent, SourceResearcherAgent,
+  TargetDiscoveryAgent, and EvaluationAgent.
 """
 import re
 import time
@@ -18,8 +20,7 @@ from core.matcher import SimilarityEngine
 from core.catalog_cache import CatalogCache
 from core.subject_filter import infer_target_subjects
 from core.config import settings
-from core.research_agent import CourseResearchAgent
-from utils.transcript_parser import TranscriptParser
+from core.agents import OrchestratorAgent
 
 # Keep legacy imports for backward compat (may not be installed)
 try:
@@ -32,7 +33,7 @@ except ImportError:
 
 
 class TransferPipeline:
-    """On-demand transfer credit evaluation pipeline."""
+    """On-demand transfer credit evaluation pipeline (multi-agent)."""
 
     def __init__(
         self,
@@ -43,7 +44,7 @@ class TransferPipeline:
         self.engine = similarity_engine
         self.cache = cache
         self.openai_client = openai_client
-        self._transcript_parser = TranscriptParser(openai_client)
+        self._orchestrator = OrchestratorAgent(openai_client)
 
     async def evaluate(self, request: PipelineRequest) -> PipelineResponse:
         """
@@ -138,103 +139,27 @@ class TransferPipeline:
         progress_callback: Optional[Callable] = None,
     ) -> TranscriptPipelineResponse:
         """
-        Full transcript pipeline:
-        parse transcript -> research source courses -> research target courses -> match -> recommend.
+        Multi-agent transcript evaluation pipeline.
+
+        The OrchestratorAgent coordinates Parser, SourceResearcher,
+        TargetDiscovery, and Evaluation agents — including a re-research
+        feedback loop for low-confidence results.
         """
         start_time = time.time()
         request_id = str(uuid.uuid4())[:8]
 
-        # Step 1: Parse transcript
-        if progress_callback:
-            await progress_callback("parsing", 0, 1, "Parsing transcript PDF...")
-        parse_result = self._transcript_parser.parse(pdf_bytes)
-        print(f"  Parsed {len(parse_result.courses)} courses from {parse_result.source_university}")
-
-        if not parse_result.courses:
-            return TranscriptPipelineResponse(
-                request_id=request_id,
-                source_university=parse_result.source_university,
-                target_university=target_university,
-                courses_parsed=0,
-                source_courses_researched=0,
-                target_courses_researched=0,
-                recommendations=[],
-                transcript_parse=parse_result,
-                summary={"error": "No courses found in transcript."},
-                processing_time_seconds=round(time.time() - start_time, 2),
-            )
-
-        # Filter out labs, recitations, seminars, etc.
-        evaluable_courses = self._filter_evaluable_courses(parse_result.courses)
-        print(f"  Filtered to {len(evaluable_courses)} evaluable courses (excluded labs/recitations/seminars)")
-
-        if not evaluable_courses:
-            return TranscriptPipelineResponse(
-                request_id=request_id,
-                source_university=parse_result.source_university,
-                target_university=target_university,
-                courses_parsed=len(parse_result.courses),
-                source_courses_researched=0,
-                target_courses_researched=0,
-                recommendations=[],
-                transcript_parse=parse_result,
-                summary={"error": "All parsed courses are labs/recitations/seminars — nothing to evaluate."},
-                processing_time_seconds=round(time.time() - start_time, 2),
-            )
-
-        # Step 2: Research source courses via AI agent
-        agent = CourseResearchAgent(self.openai_client)
-
-        async def source_progress(current, total, msg):
+        async def agent_progress(agent, stage, current, total, message):
             if progress_callback:
-                await progress_callback("researching_source", current, total, msg)
+                await progress_callback(agent, stage, current, total, message)
 
-        print(f"  Researching {len(evaluable_courses)} source courses at {parse_result.source_university}...")
-        source_courses = await agent.research_source_courses(
-            evaluable_courses, parse_result.source_university, progress_callback=source_progress
+        outcome = await self._orchestrator.run_full_evaluation(
+            pdf_bytes, target_university, progress_callback=agent_progress,
         )
 
-        # Step 3: Research target courses via AI agent
-        async def target_progress(current, total, msg):
-            if progress_callback:
-                await progress_callback("researching_target", current, total, msg)
-
-        print(f"  Searching for equivalent courses at {target_university}...")
-        target_courses = await agent.research_target_courses(
-            source_courses, target_university, progress_callback=target_progress
-        )
-        print(f"  Found {len(target_courses)} target courses at {target_university}")
-
-        if not target_courses:
-            return TranscriptPipelineResponse(
-                request_id=request_id,
-                source_university=parse_result.source_university,
-                target_university=target_university,
-                courses_parsed=len(parse_result.courses),
-                source_courses_researched=len(source_courses),
-                target_courses_researched=0,
-                recommendations=[],
-                transcript_parse=parse_result,
-                summary={"error": f"Could not find courses at {target_university}."},
-                processing_time_seconds=round(time.time() - start_time, 2),
-            )
-
-        # Step 4: Match using existing engine
-        if progress_callback:
-            await progress_callback("matching", 0, len(source_courses), "Running similarity analysis...")
-        evaluation = await self.engine.evaluate_transfer(source_courses, target_courses)
-
-        # Step 5: Build recommendations
-        recommendations = []
-        for result in evaluation["results"]:
-            rec, conf, rationale = self._make_recommendation(result)
-            recommendations.append(CourseRecommendation(
-                source_course=result.source_course,
-                matches=result.top_matches,
-                recommendation=rec,
-                confidence=conf,
-                rationale=rationale,
-            ))
+        parse_result = outcome["parse_result"]
+        source_courses = outcome["source_courses"]
+        target_courses = outcome["target_courses"]
+        recommendations = outcome["recommendations"]
 
         processing_time = round(time.time() - start_time, 2)
 
@@ -255,21 +180,6 @@ class TransferPipeline:
             },
             processing_time_seconds=processing_time,
         )
-
-    # Course types to exclude from evaluation
-    _SKIP_KEYWORDS = re.compile(
-        r"\b(lab|laboratory|recitation|seminar|practicum|internship|"
-        r"independent\s+study|thesis|dissertation|research\s+credit|"
-        r"directed\s+study|field\s+experience|clinical|co-?op)\b",
-        re.IGNORECASE,
-    )
-
-    def _filter_evaluable_courses(self, courses: list) -> list:
-        """Remove labs, recitations, seminars, and similar non-lecture courses."""
-        return [
-            c for c in courses
-            if not self._SKIP_KEYWORDS.search(c.course_name or "")
-        ]
 
     def _fetch_target_catalog(
         self,
@@ -327,14 +237,14 @@ class TransferPipeline:
         best = result.top_matches[0]
         score = best.similarity_score
 
-        if score >= 0.70:
+        if score >= 0.75:
             return (
                 "approve",
-                "very_high" if score >= 0.85 else ("high" if score >= 0.75 else "medium"),
+                "high" if score >= 0.85 else "medium",
                 f"Strong match ({int(score*100)}%) with {best.target_course.course_title}. "
                 f"{best.recommendation_rationale}",
             )
-        elif score >= 0.50:
+        elif score >= 0.55:
             return (
                 "review",
                 "medium",
@@ -344,7 +254,7 @@ class TransferPipeline:
         else:
             return (
                 "deny",
-                "medium" if score >= 0.35 else "high",
+                "medium" if score >= 0.40 else "high",
                 f"Low similarity ({int(score*100)}%) — no strong equivalent found. "
                 f"Best candidate: {best.target_course.course_title}.",
             )

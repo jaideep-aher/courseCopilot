@@ -20,12 +20,10 @@ from bs4 import BeautifulSoup
 from models.schemas import Course, TranscriptCourse
 from core.config import settings
 
-# Try to import duckduckgo-search; fall back to raw HTTP search if unavailable
-try:
-    from duckduckgo_search import DDGS
-    _HAS_DDGS = True
-except ImportError:
-    _HAS_DDGS = False
+# duckduckgo_search v8+ uses primp (Rust/reqwest) which can SIGABRT on macOS
+# when the keychain is unavailable (sandbox, CI, etc.).  Force pure-Python
+# fallback via requests + BeautifulSoup to avoid unrecoverable crashes.
+_HAS_DDGS = False
 
 
 # ============== Tool Definitions (OpenAI Function Calling) ==============
@@ -174,7 +172,7 @@ class WebSearchAgent:
     and when it has enough info to return a final answer.
     """
 
-    MAX_ITERATIONS = 8  # Max tool-calling rounds before forcing a response
+    MAX_ITERATIONS = 10  # Max tool-calling rounds before forcing a response
 
     def __init__(self, async_client: openai.AsyncOpenAI):
         self.client = async_client
@@ -285,9 +283,12 @@ When done, return ONLY valid JSON with these fields:
   "knowledge_points": "semicolon-separated list of key topics (e.g. machine learning; statistics; python)",
   "prerequisites": "prerequisite courses or knowledge, or null if not found",
   "credit_hours": null or integer number of credits,
-  "category": "academic department or field (e.g. Computer Science, Mathematics, Biology)"
+  "category": "academic department or field (e.g. Computer Science, Mathematics, Biology)",
+  "source_url": "the URL of the official catalog page or syllabus you found, or null"
 }
 
+IMPORTANT: Always include source_url — the actual URL where you found the course info. \
+This allows professors to verify the information.
 If you can't find certain information, use null for that field. Always return valid JSON."""
 
 TARGET_SYSTEM_PROMPT = """\
@@ -299,12 +300,16 @@ You have two tools:
 - scrape_webpage: Read the content of a specific URL
 
 Strategy:
-1. Search the target university's course catalog for courses in a similar field
-2. Look for courses with similar topics and content to the source course
+1. Search for "[target university] [subject] courses" or "[target university] course catalog [department]"
+2. Try the university's official course catalog or registrar page
 3. Scrape catalog pages to get course details
+4. If the first search doesn't find results, try broader terms (e.g. "economics" instead of "macroeconomics")
+
+For common subjects (economics, math, CS, biology, etc.), most universities WILL have \
+equivalent introductory and intermediate courses — keep searching until you find them.
 
 Do NOT include labs, recitations, seminars, or practicums — only lecture courses.
-Be efficient — use 1-3 searches max.
+Use 1-4 searches. Always scrape at least one catalog page for details.
 
 When done, return ONLY valid JSON as a list of up to 5 equivalent courses:
 [
@@ -315,11 +320,17 @@ When done, return ONLY valid JSON as a list of up to 5 equivalent courses:
     "knowledge_points": "semicolon-separated key topics",
     "prerequisites": "prerequisite courses or null",
     "credit_hours": null or integer,
-    "category": "academic department"
+    "category": "academic department",
+    "source_url": "the URL of the catalog page or course listing where you found this course"
   }
 ]
 
-Return an empty list [] if no equivalent courses are found. Always return valid JSON."""
+CRITICAL RULES:
+- source_url MUST be included for every course. Use the actual catalog/registrar URL. \
+  Professors will click this link to verify the course details.
+- If you scraped a catalog page listing multiple courses, use that page URL for all courses from it.
+- NEVER return an empty list for common academic subjects — try harder with broader searches.
+Return valid JSON only."""
 
 
 # ============== Course Research Agent ==============
@@ -482,6 +493,7 @@ class CourseResearchAgent:
             knowledge_points=extracted.get("knowledge_points"),
             prerequisites=extracted.get("prerequisites"),
             credit_hours=extracted.get("credit_hours"),
+            source_link=extracted.get("source_url"),
         )
 
     async def find_target_equivalents(
@@ -530,6 +542,7 @@ class CourseResearchAgent:
                 knowledge_points=item.get("knowledge_points"),
                 prerequisites=item.get("prerequisites"),
                 credit_hours=item.get("credit_hours"),
+                source_link=item.get("source_url"),
             ))
 
         return target_courses

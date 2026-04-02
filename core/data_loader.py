@@ -39,14 +39,14 @@ class CourseDataLoader:
         text = re.sub(r'https?://\S+', '', text)
         
         return text if text else None
-    
+
     def _clean_link(self, text: Optional[str]) -> Optional[str]:
-        """Clean a URL/link field (preserves the URL itself)."""
-        if pd.isna(text) or text == "..." or text == "":
+        """Clean a URL field without stripping the URL itself."""
+        if pd.isna(text) or text in ("", "...", "nan"):
             return None
         text = str(text).strip()
         return text if text else None
-
+    
     def _extract_course_code(self, title: str) -> Optional[str]:
         """Extract course code from title (e.g., 'AAS 2320' from 'AAS 2320 Intro To...')"""
         match = re.match(r'^([A-Z]{2,4}\s*\d{3,4}[A-Z]?)', title)

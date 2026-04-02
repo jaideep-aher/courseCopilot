@@ -45,11 +45,9 @@ class Course(BaseModel):
     # Computed/enriched fields
     course_code: Optional[str] = None
     credit_hours: Optional[int] = None
-
-    # Source reference
     source_link: Optional[str] = None
     data_source: Optional[str] = None
-    
+
     class Config:
         extra = "allow"
 
@@ -70,12 +68,10 @@ class CourseSummary(BaseModel):
     
     # Raw summary text
     summary_text: str = ""
-
-    # Additional metadata
     course_code: str = ""
     prerequisites: str = ""
     source_link: Optional[str] = None
-    
+
     # Completeness flags
     has_description: bool = False
     has_learning_outcomes: bool = False

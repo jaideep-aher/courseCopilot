@@ -165,11 +165,12 @@ class SimilarityMatcher:
     def __init__(self, top_n: int = 3):
         from local_matcher import LocalCourseMatcher
         self.matcher = LocalCourseMatcher(
-            model_name="all-MiniLM-L6-v2",
-            semantic_weight=0.40,   # 96% description coverage — most reliable
-            keyword_weight=0.20,
-            knowledge_points_weight=0.20,  # Sparse for many universities
-            structural_weight=0.20,
+            model_name="all-mpnet-base-v2",
+            semantic_weight=0.30,
+            keyword_weight=0.15,
+            knowledge_points_weight=0.15,
+            description_overlap_weight=0.15,
+            structural_weight=0.25,
         )
         self.top_n = top_n
 

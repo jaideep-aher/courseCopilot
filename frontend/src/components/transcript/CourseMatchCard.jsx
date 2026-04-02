@@ -46,6 +46,21 @@ export default function CourseMatchCard({ recommendation }) {
           <p className="mt-2 text-xs text-slate-600 line-clamp-2">{source_course.summary_text}</p>
         )}
 
+        {/* Source syllabus link for professor review */}
+        {source_course.source_link && (
+          <a
+            href={source_course.source_link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 mt-2 text-xs font-medium text-blue-700 hover:text-blue-900 hover:underline"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-4.5-6h6m0 0v6m0-6L9.75 14.25" />
+            </svg>
+            View Syllabus / Source
+          </a>
+        )}
+
         {/* Missing fields warning */}
         {source_course.missing_fields && source_course.missing_fields.length > 0 && (
           <div className="mt-2 text-xs text-amber-700">

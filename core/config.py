@@ -22,11 +22,12 @@ class Settings(BaseSettings):
     similarity_threshold: float = 0.3  # Minimum similarity score (0-1)
 
     # ML Model Settings (for local matcher)
-    embedding_model: str = "all-MiniLM-L6-v2"  # Sentence transformer model
-    semantic_weight: float = 0.40  # 96% description coverage — most reliable
-    keyword_weight: float = 0.20  # TF-IDF keyword similarity
-    knowledge_points_weight: float = 0.20  # Useful when available, sparse for many unis
-    structural_weight: float = 0.20  # Category/level matching
+    embedding_model: str = "all-mpnet-base-v2"  # Higher-quality sentence transformer
+    semantic_weight: float = 0.30  # Embedding similarity (high-quality model)
+    keyword_weight: float = 0.15  # TF-IDF keyword similarity
+    knowledge_points_weight: float = 0.15  # Structured keyword overlap
+    description_overlap_weight: float = 0.15  # N-gram description overlap
+    structural_weight: float = 0.25  # Category/level/prereq/credit matching
 
     # Default University Settings (can be overridden per request)
     source_university: str = "Houston"

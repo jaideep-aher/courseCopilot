@@ -327,14 +327,14 @@ class TransferPipeline:
         best = result.top_matches[0]
         score = best.similarity_score
 
-        if score >= 0.75:
+        if score >= 0.70:
             return (
                 "approve",
-                "high" if score >= 0.85 else "medium",
+                "very_high" if score >= 0.85 else ("high" if score >= 0.75 else "medium"),
                 f"Strong match ({int(score*100)}%) with {best.target_course.course_title}. "
                 f"{best.recommendation_rationale}",
             )
-        elif score >= 0.55:
+        elif score >= 0.50:
             return (
                 "review",
                 "medium",
@@ -344,7 +344,7 @@ class TransferPipeline:
         else:
             return (
                 "deny",
-                "medium" if score >= 0.40 else "high",
+                "medium" if score >= 0.35 else "high",
                 f"Low similarity ({int(score*100)}%) — no strong equivalent found. "
                 f"Best candidate: {best.target_course.course_title}.",
             )

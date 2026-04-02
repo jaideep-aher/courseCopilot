@@ -2,277 +2,211 @@
 
 **AI-Powered Transfer Credit Evaluation System**
 
-Course Co-Pilot is a tool that helps university transfer credit evaluators quickly assess course equivalency between institutions. It uses LLM-based summarization and similarity matching to compare courses and provide ranked recommendations with explanations.
+Course Co-Pilot helps students, academic advisors, and admissions offices evaluate transfer credit equivalency between universities. Upload a transcript PDF, pick a target school, and get AI-driven recommendations in minutes — not weeks.
 
-## 🎯 Features
+## Features
 
-- **Course Data Loading**: Parse structured syllabus data from CSV files
-- **LLM Summarization**: Generate standardized course summaries using Claude or GPT
-- **Similarity Matching**: Compare source courses against target university catalog
-- **Ranked Recommendations**: Get top 3 matches with similarity scores
-- **Explanation Generation**: Understand why courses are considered equivalent
-- **Missing Info Detection**: Flag courses with incomplete information
-- **REST API**: FastAPI-based API for frontend integration
-- **CLI Tool**: Command-line interface for testing and batch processing
+- **Transcript PDF Parsing**: GPT-4o vision extracts courses from any transcript format (scanned or digital)
+- **Autonomous Web Research**: AI agents search the web for course details and catalog pages in real time
+- **LLM-Based Scoring**: Courses are compared on content overlap, learning outcomes, level, prerequisites, and credits
+- **Re-Research Feedback Loop**: Low-confidence results are automatically re-researched for higher accuracy
+- **Real-Time Progress**: SSE streaming shows each agent's live status during evaluation
+- **Source Verification**: Every matched course includes a link to the official catalog page
+- **React Frontend**: Clean, modern UI for uploading transcripts and viewing results
 
-## 📁 Project Structure
+## Architecture
+
+The system uses a **multi-agent pipeline** coordinated by an Orchestrator:
 
 ```
-course_copilot/
+Transcript PDF
+     │
+     ▼
+┌──────────────┐
+│ Parser Agent │  GPT-4o vision reads all pages, extracts structured course data
+└──────┬───────┘
+       ▼
+┌──────────────────┐
+│ Research Agent   │  Autonomous web search + scraping to enrich source courses
+│ (source mode)    │  and discover target equivalents
+└──────┬───────────┘
+       ▼
+┌──────────────────┐
+│ Research Agent   │  Searches target university's catalog for equivalent courses
+│ (target mode)    │
+└──────┬───────────┘
+       ▼
+┌──────────────────┐
+│ Evaluation Agent │  LLM scores each source→target pair (0-100) on 5 dimensions
+└──────┬───────────┘
+       │
+       ▼  low confidence?
+┌──────────────────┐
+│  Orchestrator    │  Re-sends to Research Agent → re-scores → finalizes
+└──────────────────┘
+       │
+       ▼
+  Recommendations (approve / review / deny)
+```
+
+### Agent Details
+
+| Agent | Model | Tools | Job |
+|-------|-------|-------|-----|
+| **Parser** | GPT-4o (vision) | pdf2image, pdfplumber | Extract courses from transcript PDF pages |
+| **Research** | GPT-4o-mini | web_search, scrape_webpage | Autonomously search & scrape course info |
+| **Evaluation** | GPT-4o-mini | — (pure analysis) | Score course pairs on 5 dimensions |
+| **Orchestrator** | — | Coordinates agents | Sequence agents, filter courses, re-research loop |
+
+## Project Structure
+
+```
+courseCopilot/
 ├── api/
-│   ├── __init__.py
-│   └── main.py              # FastAPI application
+│   └── main.py                  # FastAPI app, routes, SSE streaming
 ├── core/
-│   ├── __init__.py
-│   ├── config.py            # Configuration settings
-│   ├── data_loader.py       # CSV parsing and course loading
-│   ├── llm_client.py        # LLM client abstraction
-│   ├── matcher.py           # Similarity matching engine
-│   └── summarizer.py        # Course summarization
+│   ├── agents.py                # Multi-agent system (Parser, Research, Eval, Orchestrator)
+│   ├── config.py                # Pydantic settings from .env
+│   ├── data_loader.py           # CSV course data loader
+│   ├── matcher.py               # LLM-based similarity scoring
+│   ├── pipeline.py              # TransferPipeline (wires agents to API)
+│   ├── research_agent.py        # WebSearchAgent + tool implementations
+│   └── catalog_cache.py         # In-memory catalog cache with TTL
 ├── models/
-│   ├── __init__.py
-│   └── schemas.py           # Pydantic data models
+│   └── schemas.py               # Pydantic models (Course, Match, Transcript, etc.)
 ├── utils/
-│   └── __init__.py
-├── data/                    # Place your CSV files here
-├── cli.py                   # Command-line interface
-├── demo.py                  # Demo script
-├── requirements.txt         # Python dependencies
-├── .env.example             # Environment template
+│   ├── transcript_parser.py     # PDF → structured transcript (vision + text fallback)
+│   ├── catalog_scraper.py       # University catalog web scraper
+│   └── converters.py            # Data format converters
+├── frontend/
+│   ├── src/
+│   │   ├── App.jsx
+│   │   ├── pages/
+│   │   │   └── TranscriptUploadPage.jsx
+│   │   ├── components/transcript/
+│   │   │   ├── FileUpload.jsx
+│   │   │   ├── ProgressTracker.jsx
+│   │   │   ├── ResultsDisplay.jsx
+│   │   │   └── CourseMatchCard.jsx
+│   │   ├── hooks/
+│   │   │   └── useTranscriptEval.js
+│   │   └── api/
+│   │       └── client.js
+│   ├── vite.config.js           # Vite + proxy to backend
+│   └── package.json
+├── data/
+│   └── syllabus_dataset.csv     # Pre-loaded course dataset (304 courses)
+├── requirements.txt
+├── .env.example
 └── README.md
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
-### 1. Installation
+### 1. Install Dependencies
 
 ```bash
-# Clone/copy the project
-cd course_copilot
-
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
+# Backend
 pip install -r requirements.txt
+
+# Frontend
+cd frontend && npm install
 ```
 
-### 2. Configuration
+### 2. Configure Environment
 
 ```bash
-# Copy environment template
 cp .env.example .env
-
-# Edit .env and add your API key
-# ANTHROPIC_API_KEY=sk-ant-...
-# or
-# OPENAI_API_KEY=sk-...
 ```
 
-### 3. Prepare Data
+Edit `.env` and set your OpenAI API key:
 
-Place your syllabus CSV file in the `data/` directory. The CSV should have these columns:
-- `university` - University name (e.g., "Houston", "Duke")
-- `category` - Department/category
-- `file_name` - Unique identifier for the course
-- `course_title` - Course name
-- `course_description_summary` - Course description
-- `knowledge_points` - Topics/learning outcomes
-- `prerequisites` - Prerequisites
-- `textbooks_materials` - Required materials
-- `grading_scale` - Grading information
-- `assignments_summary` - Assignment details
-- `weekly_schedule_highlights` - Schedule/topics by week
+```
+OPENAI_API_KEY=sk-...
+```
 
-### 4. Run the API
+### 3. Start the Servers
 
 ```bash
-# Start the FastAPI server
-python -m uvicorn api.main:app --reload --port 8000
+# Terminal 1 — Backend (port 8000)
+python api/main.py
 
-# API will be available at:
-# - http://localhost:8000 (root)
-# - http://localhost:8000/docs (Swagger UI)
-# - http://localhost:8000/redoc (ReDoc)
+# Terminal 2 — Frontend (port 5173)
+cd frontend && npm run dev
 ```
 
-### 5. Use the CLI
+Open **http://localhost:5173** in your browser.
 
-```bash
-# List available courses
-python cli.py list data/syllabus_dataset.csv
+### 4. Use It
 
-# List courses from specific university
-python cli.py list data/syllabus_dataset.csv --university Houston
+1. Upload a transcript PDF
+2. Enter the target university name (e.g. Duke, MIT, Stanford)
+3. Click **Evaluate Transfer Credits**
+4. Watch real-time progress as each agent works
+5. Review results with scores, shared topics, differences, and catalog links
 
-# Run evaluation
-python cli.py evaluate data/syllabus_dataset.csv
+## API Endpoints
 
-# Evaluate specific courses
-python cli.py evaluate data/syllabus_dataset.csv --courses "AAS 2320..." "ACCT 2301..."
+### Transcript Evaluation (Primary)
 
-# Save results to JSON
-python cli.py evaluate data/syllabus_dataset.csv --output results.json
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/pipeline/transcript-evaluate` | Evaluate transcript PDF (returns full result) |
+| `POST` | `/pipeline/transcript-evaluate-stream` | Same, but with SSE progress streaming |
 
-# View statistics
-python cli.py stats data/syllabus_dataset.csv
-```
+Both accept `multipart/form-data` with:
+- `file` — transcript PDF
+- `target_university` — target school name (e.g. "Duke")
 
-## 📡 API Endpoints
+### Pipeline Evaluation
 
-### General
-- `GET /` - API information
-- `GET /health` - Health check
-- `GET /statistics` - Data statistics
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/pipeline/evaluate` | Evaluate manually specified courses against a target university |
 
-### Data Management
-- `POST /data/load` - Load CSV file
-  ```json
-  {"csv_path": "data/syllabus_dataset.csv"}
-  ```
+### Legacy CSV-Based Endpoints
 
-### Courses
-- `GET /courses` - List all courses
-- `GET /courses/source` - List source (Houston) courses
-- `GET /courses/target` - List target (Duke) courses
-- `GET /courses/{course_id}` - Get course details
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/` | API info |
+| `GET` | `/health` | Health check |
+| `POST` | `/data/load` | Load CSV dataset |
+| `GET` | `/courses` | List all courses |
+| `POST` | `/match/single` | Match a single course from the CSV dataset |
+| `POST` | `/match/batch` | Match multiple courses |
+| `POST` | `/evaluate` | Full evaluation from CSV |
 
-### Matching
-- `POST /match/single` - Match single course
-  ```json
-  {
-    "source_course_id": "AAS 2320 20153 Intro...",
-    "target_university": "Duke"
-  }
-  ```
+## Configuration
 
-- `POST /match/batch` - Match multiple courses
-  ```json
-  {
-    "source_course_ids": ["course1", "course2"],
-    "target_university": "Duke"
-  }
-  ```
-
-- `POST /evaluate` - Full evaluation
-  ```json
-  {
-    "source_courses": ["course1", "course2"],
-    "target_university": "Duke"
-  }
-  ```
-
-## 🔧 Programmatic Usage
-
-```python
-import asyncio
-from core.data_loader import CourseDataLoader
-from core.matcher import SimilarityEngine
-
-async def main():
-    # Load data
-    loader = CourseDataLoader("data/syllabus_dataset.csv")
-    loader.load()
-    
-    # Get courses
-    source_courses = loader.get_source_courses("Houston")
-    target_courses = loader.get_target_courses("Duke")
-    
-    # Initialize engine
-    engine = SimilarityEngine()
-    
-    # Evaluate
-    results = await engine.evaluate_transfer(source_courses, target_courses)
-    
-    # Process results
-    for result in results["results"]:
-        print(f"Source: {result.source_course.course_title}")
-        for match in result.top_matches:
-            print(f"  -> {match.target_course.course_title}: {match.similarity_percentage}%")
-
-asyncio.run(main())
-```
-
-## 📊 Output Format
-
-Match results include:
-
-```json
-{
-  "source_course": {
-    "course_id": "AAS 2320...",
-    "course_title": "Intro To African American Studies",
-    "university": "Houston",
-    "category": "African_American_Studies",
-    "main_topics": ["culture", "african american", "history"],
-    "learning_outcomes": ["Understand key theories", "..."],
-    "course_level": "introductory",
-    "missing_fields": []
-  },
-  "top_matches": [
-    {
-      "target_course": {...},
-      "similarity_score": 0.85,
-      "similarity_percentage": 85,
-      "topic_overlap": ["culture", "history"],
-      "learning_outcome_alignment": ["Critical analysis skills"],
-      "key_differences": ["Different regional focus"],
-      "recommendation_rationale": "Both courses provide foundational...",
-      "confidence_level": "high"
-    }
-  ],
-  "best_match_found": true,
-  "evaluation_notes": "Strong match found in target catalog.",
-  "missing_info_warning": null
-}
-```
-
-## ⚙️ Configuration Options
+All settings are managed via environment variables or `.env` file:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `LLM_PROVIDER` | anthropic | LLM provider (anthropic/openai) |
-| `LLM_MODEL` | claude-sonnet-4-20250514 | Model to use |
-| `LLM_TEMPERATURE` | 0.3 | Response randomness (0-1) |
-| `TOP_N_MATCHES` | 3 | Number of matches to return |
-| `SIMILARITY_THRESHOLD` | 0.5 | Minimum similarity score |
+| `OPENAI_API_KEY` | — | **Required.** OpenAI API key |
+| `SCORING_MODEL` | `gpt-4o-mini` | Model for course similarity scoring |
+| `VISION_MODEL` | `gpt-4o` | Model for transcript PDF parsing |
+| `RESEARCH_MODEL` | `gpt-4o-mini` | Model for web research agent |
+| `TOP_N_MATCHES` | `3` | Number of top matches to return per course |
+| `SIMILARITY_THRESHOLD` | `0.3` | Minimum similarity score (0-1) |
+| `MAX_CONCURRENT_RESEARCH` | `2` | Parallel web research tasks |
+| `RESEARCH_TIMEOUT_SECONDS` | `30` | Timeout per research call |
+| `DEBUG` | `true` | Enable debug logging |
 
-## 🧪 Testing
+## Tech Stack
 
-```bash
-# Run tests
-pytest
+**Backend**: Python, FastAPI, OpenAI API, pdfplumber, pdf2image, BeautifulSoup, Pydantic
 
-# Run with coverage
-pytest --cov=core --cov=api
-```
+**Frontend**: React 19, Vite 7, Tailwind CSS 4, Axios
 
-## 🔐 Security Notes
+**AI Models**: GPT-4o (vision), GPT-4o-mini (research + scoring)
+
+## Security Notes
 
 - Never commit `.env` files with API keys
-- Transcripts may contain PII - handle securely
+- Transcripts may contain PII — handle securely
 - Use HTTPS in production
-- Configure CORS appropriately
+- CORS is configured for local development; restrict in production
 
-## 📝 Architecture Notes
+## License
 
-The system uses **LLM summarization** approach:
-1. Load course data from CSV
-2. Generate standardized summaries using LLM
-3. Compare all source courses against target catalog in single LLM call
-4. Parse structured JSON responses for matches
-5. Return ranked results with explanations
-
-Alternative approaches (RAG, embeddings) can be added to `core/matcher.py` if needed.
-
-## 🤝 Integration with ProcessMaker
-
-This is a standalone Python microservice. The frontend team should:
-1. Call `POST /data/load` on startup
-2. Use `POST /match/single` or `POST /match/batch` for evaluations
-3. Display results with similarity scores and rationales
-
-## 📄 License
-
-Internal use - ProcessMaker / Duke AIPI Capstone Project
+Internal use — ProcessMaker / Duke AIPI Capstone Project

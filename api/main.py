@@ -15,11 +15,14 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 import json
+import re
 import uuid
 import time
 import asyncio
 
 import openai
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
 
 from core.config import settings
 from core.data_loader import CourseDataLoader
@@ -50,6 +53,19 @@ api_app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+class DedupePathSlashMiddleware(BaseHTTPMiddleware):
+    """Fix paths like //pipeline/... (404) when VITE_API_URL has a trailing slash or proxies mangle the URL."""
+
+    async def dispatch(self, request: Request, call_next):
+        path = request.scope.get("path") or ""
+        if "//" in path:
+            request.scope["path"] = re.sub(r"/+", "/", path)
+        return await call_next(request)
+
+
+api_app.add_middleware(DedupePathSlashMiddleware)
 
 # Global state (in production, use proper database)
 data_loader: Optional[CourseDataLoader] = None

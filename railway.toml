@@ -1,4 +1,7 @@
 # https://docs.railway.com/reference/config-as-code
+# Default: single Docker image (API + built SPA). For split API + static frontend,
+# use two Railway services — see RAILWAY.md (API: Railpack + root; frontend: frontend/).
+
 [build]
 builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"

@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from 'react'
-import api from '../api/client'
+import api, { API_BASE } from '../api/client'
 
 export default function useTranscriptEval() {
   const [loading, setLoading] = useState(false)
@@ -21,7 +21,7 @@ export default function useTranscriptEval() {
 
     try {
       // Try streaming endpoint first for progress updates
-      const response = await fetch('/api/pipeline/transcript-evaluate-stream', {
+      const response = await fetch(`${API_BASE}/pipeline/transcript-evaluate-stream`, {
         method: 'POST',
         body: formData,
       })

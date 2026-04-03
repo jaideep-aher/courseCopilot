@@ -11,7 +11,12 @@ from typing import List, Optional
 
 import openai
 import pdfplumber
-from pdf2image import convert_from_bytes
+
+try:
+    from pdf2image import convert_from_bytes
+    _HAS_PDF2IMAGE = True
+except ImportError:
+    _HAS_PDF2IMAGE = False
 
 from models.schemas import TranscriptCourse, TranscriptParseResult
 from core.config import settings
@@ -76,6 +81,8 @@ class TranscriptParser:
 
         # Convert PDF pages to images (lower DPI to save tokens)
         try:
+            if not _HAS_PDF2IMAGE:
+                raise ImportError("pdf2image not installed")
             images = convert_from_bytes(pdf_bytes, dpi=150)
         except Exception as e:
             warnings.append(f"Could not convert PDF to images: {e}. Falling back to text extraction.")

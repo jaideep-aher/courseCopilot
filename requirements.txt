@@ -15,16 +15,11 @@ anthropic
 
 # PDF Processing
 pdfplumber
-pdf2image
 
 # Web Search Agent
 duckduckgo-search
 beautifulsoup4
 requests
-
-# ML / Matching
-sentence-transformers
-scikit-learn
 
 # Environment & Config
 python-dotenv

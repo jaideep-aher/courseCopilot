@@ -1,0 +1,14 @@
+# Use when this Railway service has Root Directory set to `frontend`.
+# https://docs.railway.com/guides/monorepo#deploying-a-subdirectory
+
+[build]
+builder = "RAILPACK"
+# Railpack already runs `npm ci` in the install step — do not run it again here or
+# `npm ci` can hit EBUSY removing node_modules/.vite while Vite holds the cache.
+buildCommand = "npm run build"
+
+[deploy]
+startCommand = "npm run start"
+healthcheckPath = "/"
+healthcheckTimeout = 100
+restartPolicyType = "ON_FAILURE"

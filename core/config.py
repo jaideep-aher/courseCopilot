@@ -21,13 +21,8 @@ class Settings(BaseSettings):
     top_n_matches: int = 3
     similarity_threshold: float = 0.3  # Minimum similarity score (0-1)
 
-    # ML Model Settings (for local matcher)
-    embedding_model: str = "all-mpnet-base-v2"  # Higher-quality sentence transformer
-    semantic_weight: float = 0.30  # Embedding similarity (high-quality model)
-    keyword_weight: float = 0.15  # TF-IDF keyword similarity
-    knowledge_points_weight: float = 0.15  # Structured keyword overlap
-    description_overlap_weight: float = 0.15  # N-gram description overlap
-    structural_weight: float = 0.25  # Category/level/prereq/credit matching
+    # LLM Scoring Model (used for course matching)
+    scoring_model: str = "gpt-4o-mini"
 
     # Default University Settings (can be overridden per request)
     source_university: str = "Houston"

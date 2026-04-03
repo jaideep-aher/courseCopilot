@@ -3,7 +3,9 @@
 
 [build]
 builder = "RAILPACK"
-buildCommand = "npm ci && npm run build"
+# Railpack already runs `npm ci` in the install step — do not run it again here or
+# `npm ci` can hit EBUSY removing node_modules/.vite while Vite holds the cache.
+buildCommand = "npm run build"
 
 [deploy]
 startCommand = "npm run start"

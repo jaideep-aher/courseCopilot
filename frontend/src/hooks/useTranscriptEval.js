@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef } from 'react'
-import api from '../api/client'
+import api, { API_BASE } from '../api/client'
+import { TRANSCRIPT_EVAL_TIMEOUT_MS } from '../constants/timeouts'
 
 export default function useTranscriptEval() {
   const [loading, setLoading] = useState(false)
@@ -20,10 +21,10 @@ export default function useTranscriptEval() {
     formData.append('top_n', String(Math.min(10, Math.max(1, topN))))
 
     try {
-      // Try streaming endpoint first for progress updates
-      const response = await fetch('/api/pipeline/transcript-evaluate-stream', {
+      const response = await fetch(`${API_BASE}/pipeline/transcript-evaluate-stream`, {
         method: 'POST',
         body: formData,
+        headers: { Accept: 'text/event-stream' },
       })
 
       if (!response.ok) {
@@ -62,7 +63,6 @@ export default function useTranscriptEval() {
         }
       }
     } catch (streamErr) {
-      // If streaming fails, fall back to non-streaming endpoint
       if (streamErr.message?.includes('Server error') || streamErr.message?.includes('not configured')) {
         setError(streamErr.message)
         setLoading(false)
@@ -70,15 +70,26 @@ export default function useTranscriptEval() {
         return
       }
 
+      if (import.meta.env.DEV) {
+        console.warn('[transcript] SSE failed, using non-streaming POST:', streamErr)
+      }
+
       try {
         setProgress({ stage: 'parsing', current: 0, total: 0, message: 'Processing (no live progress)...' })
         const res = await api.post('/pipeline/transcript-evaluate', formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
-          timeout: 300000,
+          timeout: TRANSCRIPT_EVAL_TIMEOUT_MS,
         })
         setResult(res.data)
       } catch (fallbackErr) {
-        const msg = fallbackErr.response?.data?.detail || fallbackErr.message || 'Evaluation failed'
+        const isTimeout =
+          fallbackErr.code === 'ECONNABORTED' ||
+          String(fallbackErr.message || '').toLowerCase().includes('timeout')
+        const base =
+          fallbackErr.response?.data?.detail || fallbackErr.message || 'Evaluation failed'
+        const msg = isTimeout
+          ? `${base} The full pipeline can take more than 5 minutes. This build waits up to ~14 minutes; if it still times out, check API logs or try a shorter transcript.`
+          : base
         setError(msg)
       }
     } finally {

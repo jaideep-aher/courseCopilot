@@ -2,8 +2,11 @@
 Course Co-Pilot API
 FastAPI application for transfer credit evaluation
 """
+import sys
 import os
 from pathlib import Path
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware

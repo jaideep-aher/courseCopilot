@@ -15,8 +15,8 @@ export default function StudentSignupPage() {
     return (
       <div className="min-h-screen cc-page-bg flex flex-col items-center justify-center px-5 py-16">
         <div className="cc-card p-8 max-w-md text-center">
-          <p className="text-[var(--cc-label)]">Supabase is not configured for this build.</p>
-          <p className="cc-footnote mt-2">Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY, then redeploy.</p>
+          <p className="text-[var(--cc-label)]">Online sign-up is not enabled for this build.</p>
+          <p className="cc-footnote mt-2">Your administrator must turn on cloud auth variables for the frontend, then redeploy.</p>
           <Link to="/login" className="cc-btn-primary inline-block mt-6">
             Back to sign in
           </Link>
@@ -59,7 +59,7 @@ export default function StudentSignupPage() {
       return
     }
     setInfo(
-      'Check your email to confirm your address, then sign in as Student. If confirmations are disabled in Supabase, try signing in now.',
+      'Check your email to confirm your address, then sign in as Student. If your project skips email confirmation, try signing in now.',
     )
   }
 

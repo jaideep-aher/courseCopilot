@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
 import { ROLE_META } from '../auth/roles'
+import { isSupabaseConfigured } from '../lib/supabaseClient'
 
 const cards = [
   {
@@ -107,9 +108,9 @@ export default function LandingPage() {
             and admins do not enter the student transcript portal; faculty get syllabus tools only — same API behind
             the scenes.
           </p>
-          {!user && (
+          {!user && !isSupabaseConfigured && (
             <p className="mt-4 cc-footnote">
-              Demo mode: accounts are hardcoded now; Supabase-backed auth and data will connect here later.
+              This deployment is using local demo sign-in. Connect cloud auth to use email accounts and shared data.
             </p>
           )}
         </div>
@@ -151,7 +152,7 @@ export default function LandingPage() {
 
       <footer className="border-t border-[var(--cc-separator)] py-8">
         <div className="max-w-5xl mx-auto px-5 cc-footnote text-center">
-          Course Co-Pilot — static stakeholder portals (database & Supabase integration planned).
+          Course Co-Pilot — role-based portals for transfer evaluation.
         </div>
       </footer>
     </div>

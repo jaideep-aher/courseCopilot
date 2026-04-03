@@ -25,7 +25,7 @@ export default function CoordinatorDeadlinesPage() {
     e.preventDefault()
     setMsg(null)
     if (!isSupabaseConfigured) {
-      setMsg({ type: 'err', text: 'Supabase required.' })
+      setMsg({ type: 'err', text: 'Cloud storage is not enabled on this deployment.' })
       return
     }
     try {
@@ -41,7 +41,7 @@ export default function CoordinatorDeadlinesPage() {
     <PageContainer
       wide
       title="Student deadlines"
-      subtitle="Set due dates for evaluation submission (Supabase UUID students only)."
+      subtitle="Set due dates for evaluation submission (students signed in with a full account)."
       breadcrumbs={[{ to: '/coordinator', label: 'University' }, { label: 'Deadlines' }]}
     >
       <StakeholderNav items={navItems} />

@@ -11,7 +11,7 @@ export default function ProfessorContactPage() {
   return (
     <PageContainer
       title="Contact coordinator"
-      subtitle="Placeholder — no messages are sent yet. Supabase or email integration will go here."
+      subtitle="Placeholder — no messages are sent yet. Your team can connect email or a ticketing backend here later."
       breadcrumbs={[
         { to: '/professor', label: 'Faculty' },
         { label: 'Contact' },

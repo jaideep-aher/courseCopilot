@@ -1,5 +1,5 @@
 /**
- * Stakeholder roles (static demo — will map to Supabase roles later).
+ * Stakeholder roles (demo usernames and cloud profiles both use these ids).
  * coordinator = university / articulation staff (evaluators). admin = ops / IT-style access.
  */
 export const ROLE_IDS = ['student', 'university', 'coordinator', 'professor', 'admin']

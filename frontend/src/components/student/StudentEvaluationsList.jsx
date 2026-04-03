@@ -1,3 +1,5 @@
+import { isSupabaseConfigured } from '../../lib/supabaseClient'
+
 export default function StudentEvaluationsList({ rows, loading, error }) {
   if (loading) {
     return (
@@ -13,8 +15,11 @@ export default function StudentEvaluationsList({ rows, loading, error }) {
     return (
       <div className="cc-card p-10 text-center border-dashed" style={{ borderStyle: 'dashed' }}>
         <p className="cc-footnote max-w-md mx-auto">
-          No saved runs yet. Complete a transcript evaluation below — results are stored automatically when the pipeline
-          finishes (browser storage for demo accounts; Supabase when configured with auth UUIDs).
+          No saved runs yet. Complete a transcript evaluation below — results save automatically when the pipeline
+          finishes
+          {isSupabaseConfigured
+            ? ' to your account.'
+            : ' in this browser (use email sign-in and cloud storage so data follows your account).'}
         </p>
       </div>
     )

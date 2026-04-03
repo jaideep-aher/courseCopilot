@@ -13,14 +13,14 @@ const navItems = [
 
 const placeholderRows = [
   { id: '—', student: 'Pending integration', course: '—', status: 'Static placeholder' },
-  { id: '—', student: 'Supabase will populate', course: '—', status: '—' },
+  { id: '—', student: 'Live data later', course: '—', status: '—' },
 ]
 
 export default function CoordinatorReviewQueuePage() {
   return (
     <PageContainer
       title="Review queue"
-      subtitle="This table is static. Connect Supabase to show real pending evaluations and assignments."
+      subtitle="This table is static for now. It can be wired to your real review queue when you connect backend data."
       breadcrumbs={[
         { to: '/coordinator', label: 'University' },
         { label: 'Review queue' },

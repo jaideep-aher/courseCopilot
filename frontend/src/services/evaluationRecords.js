@@ -1,12 +1,12 @@
 /**
- * Persist evaluation runs for students; university/professor reads via Supabase.
- * Falls back to localStorage when Supabase is not configured (demo / dev).
+ * Persist evaluation runs for students; staff reads when cloud storage is configured.
+ * Falls back to localStorage when the cloud client is not configured (demo / dev).
  */
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient'
 
 const LS_PREFIX = 'cc_evaluations:'
 
-/** Supabase FK expects auth.users ids (UUID). Demo hardcoded ids use localStorage only. */
+/** Cloud rows expect real user UUIDs. Demo hardcoded ids use localStorage only. */
 function isUuid(id) {
   return typeof id === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)
 }
@@ -31,7 +31,7 @@ function writeLocal(userId, rows) {
 }
 
 /**
- * @param {string} userId - app user id (hardcoded session or Supabase auth id)
+ * @param {string} userId - app user id (hardcoded session or cloud auth id)
  * @param {object} params
  * @param {string} params.targetUniversity
  * @param {object} params.result - full API result (stored as JSON)
@@ -117,7 +117,7 @@ export async function listPendingFacultyReviews() {
 
 export async function setFacultyDecision(evaluationId, professorId, decision, notes = '') {
   if (!isSupabaseConfigured || !supabase || !isUuid(professorId)) {
-    throw new Error('Supabase and valid professor UUID required for faculty decisions')
+    throw new Error('Cloud storage and a signed-in faculty account are required for decisions.')
   }
 
   const decidedAt = new Date().toISOString()
@@ -143,7 +143,7 @@ export async function setFacultyDecision(evaluationId, professorId, decision, no
 
 export async function upsertStudentDeadline(studentId, dueAtIso, setByUserId, notes) {
   if (!isSupabaseConfigured || !supabase) {
-    throw new Error('Supabase required for deadlines')
+    throw new Error('Cloud storage is required to set deadlines.')
   }
   const { error } = await supabase.from('student_deadlines').upsert(
     {

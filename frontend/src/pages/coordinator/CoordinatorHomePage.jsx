@@ -25,7 +25,7 @@ export default function CoordinatorHomePage() {
   return (
     <PageContainer
       title="University console"
-      subtitle="University portal: Supabase-backed operations (evaluations, deadlines) plus live API tools. Wire env keys and run SQL migrations on branch jaideep."
+      subtitle="Evaluation log, deadlines, faculty workflow, and live matching tools — all in one place for your team."
       breadcrumbs={[{ label: 'University' }]}
     >
       <StakeholderNav items={navItems} />
@@ -56,7 +56,7 @@ export default function CoordinatorHomePage() {
           style={{ borderStyle: 'dashed' }}
         >
           <h3 className="cc-title-3 font-display mb-2">Review queue</h3>
-          <p className="cc-footnote">Placeholder list for pending cases — will sync from Supabase later.</p>
+          <p className="cc-footnote">Track items awaiting review or policy checks. Wire this view to your queue when ready.</p>
           <span className="mt-4 inline-block text-[15px] font-medium text-[var(--cc-accent)]">View queue →</span>
         </Link>
         <Link

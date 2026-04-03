@@ -110,7 +110,7 @@ export function AuthProvider({ children }) {
           await supabase.auth.signOut()
           return {
             ok: false,
-            error: 'No profile row found. Run Supabase migrations 001–002 (and signup trigger) and try again.',
+            error: 'Account exists but has no profile. Complete setup on the server or contact your administrator.',
           }
         }
         if (!isValidRole(profile.role)) {

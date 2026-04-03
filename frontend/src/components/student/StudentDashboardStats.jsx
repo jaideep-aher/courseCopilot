@@ -1,11 +1,21 @@
+import { isSupabaseConfigured } from '../../lib/supabaseClient'
+
 export default function StudentDashboardStats({ totalRuns, inReview, deadlineLabel }) {
   const cards = [
     { label: 'Evaluations saved', value: totalRuns, hint: 'Each run is stored after the pipeline finishes.' },
-    { label: 'In faculty review', value: inReview, hint: 'Awaiting professor approve / reject (when using Supabase).' },
+    {
+      label: 'In faculty review',
+      value: inReview,
+      hint: isSupabaseConfigured
+        ? 'Awaiting professor approve or reject when your school uses the faculty workflow.'
+        : 'Faculty review appears here when this deployment uses cloud storage and your run is in review.',
+    },
     {
       label: 'Your deadline',
       value: deadlineLabel || '—',
-      hint: 'Set by your university when connected to Supabase.',
+      hint: isSupabaseConfigured
+        ? 'Set by your university staff when they assign a due date.'
+        : 'Your school can set a due date once cloud storage is enabled for this deployment.',
     },
   ]
 

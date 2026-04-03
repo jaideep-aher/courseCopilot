@@ -23,7 +23,7 @@ const steps = [
   },
   {
     title: 'Talk to your coordinator',
-    body: 'Scores are decision-support only. Final articulation stays with your institution; messaging will connect here after Supabase.',
+    body: 'Scores are decision-support only. Final articulation stays with your institution; messaging can connect here when your school enables it.',
   },
 ]
 

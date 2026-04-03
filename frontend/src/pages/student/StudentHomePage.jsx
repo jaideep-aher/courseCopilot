@@ -74,7 +74,12 @@ export default function StudentHomePage() {
       if (!user?.id) return
       try {
         await saveStudentEvaluation(user.id, { targetUniversity, result })
-        setSaveBanner({ type: 'ok', text: 'Evaluation saved. University and faculty can see it when Supabase is live.' })
+        setSaveBanner({
+          type: 'ok',
+          text: isSupabaseConfigured
+            ? 'Evaluation saved.'
+            : 'Evaluation saved in this browser only. Use email sign-in on a deployment with cloud storage so staff can see your runs.',
+        })
         await reload()
       } catch (e) {
         setSaveBanner({ type: 'err', text: e.message || 'Could not save evaluation' })
@@ -92,21 +97,18 @@ export default function StudentHomePage() {
         <h1 className="cc-large-title font-display max-w-3xl">Transfer credit workspace</h1>
         {isSupabaseConfigured ? (
           <p className="mt-4 text-[19px] leading-relaxed text-[var(--cc-label-secondary)] max-w-3xl">
-            Run the transcript pipeline, track saved evaluations, and see deadlines. Signed-in users with Supabase Auth
-            sync data to your project; demo IDs still use the browser until you use real UUID accounts.
+            Run the transcript pipeline, track saved evaluations, and see deadlines. Data is tied to your signed-in
+            account so your school can review progress when you use email login (not the local-only demo usernames).
           </p>
         ) : (
           <>
             <p className="mt-4 text-[19px] leading-relaxed text-[var(--cc-label-secondary)] max-w-3xl">
-              Run the transcript pipeline and track runs here. Without Supabase, saves stay in{' '}
-              <strong className="text-[var(--cc-label)]">this browser only</strong> (demo logins).
+              Run the transcript pipeline and track runs here. Until cloud storage is enabled for this deployment, saves
+              stay in <strong className="text-[var(--cc-label)]">this browser only</strong>.
             </p>
             <p className="mt-3 cc-footnote max-w-3xl">
-              To store data in the cloud and power university / professor dashboards, add these to your{' '}
-              <strong>frontend</strong> build env (e.g. Railway → frontend service → Variables), then redeploy:{' '}
-              <code className="font-mono text-[12px]">VITE_SUPABASE_URL</code>,{' '}
-              <code className="font-mono text-[12px]">VITE_SUPABASE_ANON_KEY</code> (from Supabase → Project Settings →
-              API).
+              To sync across devices and show runs to university staff, your deployment needs the project&apos;s cloud
+              URL and anonymous key in the <strong>frontend</strong> build environment, then a fresh deploy.
             </p>
           </>
         )}
@@ -170,14 +172,6 @@ export default function StudentHomePage() {
         </div>
       </section>
 
-      <div className="mt-10 cc-card p-6 bg-[var(--cc-bg)] border-transparent max-w-3xl">
-        <p className="cc-footnote leading-relaxed">
-          Production roadmap on branch <code className="font-mono text-[12px]">jaideep</code>: Supabase auth replaces
-          demo login, university staff manage deadlines and queues, professors approve outcomes — see{' '}
-          <code className="font-mono text-[12px]">docs/TRANSFER_CREDIT_STAKEHOLDERS.md</code> and{' '}
-          <code className="font-mono text-[12px]">supabase/migrations/</code>.
-        </p>
-      </div>
     </PageContainer>
   )
 }

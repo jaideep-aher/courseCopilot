@@ -13,7 +13,7 @@ export default function TranscriptUploadPanel({
   showHowItWorksWhenIdle = true,
   variant = 'default',
   embeddedInHero = false,
-  /** Called once when pipeline returns a result (for Supabase / local persistence). */
+  /** Called once when pipeline returns a result (cloud or local persistence). */
   onEvaluationComplete,
 }) {
   const workspace = variant === 'workspace'

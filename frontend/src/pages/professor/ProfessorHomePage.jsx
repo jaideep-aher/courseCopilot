@@ -13,7 +13,7 @@ const tools = [
   {
     to: '/professor/reviews',
     title: 'Evaluation reviews',
-    desc: 'Approve or reject student evaluation runs when Supabase is configured.',
+    desc: 'Approve or reject student evaluation runs when cloud storage is enabled.',
     live: true,
   },
   {
@@ -40,7 +40,7 @@ export default function ProfessorHomePage() {
   return (
     <PageContainer
       title="Faculty workspace"
-      subtitle="Help students and coordinators with clear syllabus data. Live tools use your API; tips and contact flows are static until messaging is wired to Supabase."
+      subtitle="Help students and coordinators with clear syllabus data. Live tools use your API; tips and contact flows stay static until messaging is wired in."
       breadcrumbs={[{ label: 'Faculty' }]}
     >
       <StakeholderNav items={navItems} />

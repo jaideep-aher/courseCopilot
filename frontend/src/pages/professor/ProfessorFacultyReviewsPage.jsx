@@ -55,7 +55,9 @@ export default function ProfessorFacultyReviewsPage() {
       <StakeholderNav items={navItems} />
 
       {!isSupabaseConfigured && (
-        <p className="cc-footnote mb-8">Configure Supabase and sign in with a UUID professor profile to use this page.</p>
+        <p className="cc-footnote mb-8">
+          Enable cloud storage for this deployment and sign in with a faculty email account to use this page.
+        </p>
       )}
 
       {msg && (

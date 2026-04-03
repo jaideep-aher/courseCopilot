@@ -160,11 +160,11 @@ export default function LoginPage() {
 
           {isSupabaseConfigured && (
             <div className="mt-10 pt-8 border-t border-[var(--cc-separator)]">
-              <p className="text-[13px] font-medium text-[var(--cc-label)] mb-1">SQL seed accounts</p>
+              <p className="text-[13px] font-medium text-[var(--cc-label)] mb-1">Team test accounts</p>
               <p className="cc-footnote mb-5">
-                After running <code className="font-mono text-[12px]">003_seed_demo_users.sql</code>, use password{' '}
-                <span className="font-mono text-[var(--cc-label)]">{SUPABASE_SEED_DEMO_PASSWORD}</span>. Pick the matching
-                portal tab, then tap an account below.
+                For environments with seeded database users: shared password{' '}
+                <span className="font-mono text-[var(--cc-label)]">{SUPABASE_SEED_DEMO_PASSWORD}</span>. Choose the
+                matching portal tab, then pick a row below.
               </p>
               <ul className="space-y-2">
                 {SUPABASE_SEED_ACCOUNTS.filter((a) => a.role === role).map((a) => (
@@ -190,8 +190,8 @@ export default function LoginPage() {
             <p className="cc-footnote mb-5">
               Password for all: <span className="font-mono text-[var(--cc-label)]">{DEMO_PASSWORD}</span>.{' '}
               <span className="font-mono">username</span> works with <strong>any</strong> portal tab; other demo users
-              only work when that matching role is selected above. Still works if Supabase is configured but the email is
-              not a cloud user.
+              only work when that matching role is selected above. These still work if your email is not a registered
+              cloud account.
             </p>
             <ul className="space-y-2">
               {HARDCODED_USERS.map((u) => (

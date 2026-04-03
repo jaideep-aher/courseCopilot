@@ -38,7 +38,7 @@ export default function CoordinatorStudentsPage() {
       <StakeholderNav items={navItems} />
 
       {!isSupabaseConfigured ? (
-        <p className="cc-footnote">Connect Supabase to list evaluation rows.</p>
+        <p className="cc-footnote">Connect cloud storage for this deployment to list evaluation rows.</p>
       ) : loading ? (
         <p className="cc-footnote">Loading…</p>
       ) : (

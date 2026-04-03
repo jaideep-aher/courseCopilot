@@ -4,6 +4,9 @@
 -- Shared password for all accounts below (change in Supabase Auth or via SQL after first login):
 --   CourseCopilotDemo2026!
 --
+-- Token columns must be '' not NULL — otherwise sign-in returns "Database error querying schema"
+-- (GoTrue cannot scan NULL into string fields). See supabase/auth#1940.
+--
 -- Emails use @coursecopilot.demo so you can delete/re-run safely:
 --   delete from auth.identities where user_id in (select id from auth.users where email like '%@coursecopilot.demo');
 --   delete from auth.users where email like '%@coursecopilot.demo';
@@ -31,7 +34,8 @@ begin
   -- student
   insert into auth.users (
     id, instance_id, aud, role, email, encrypted_password,
-    email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at
+    email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at,
+    confirmation_token, email_change, email_change_token_new, recovery_token
   ) values (
     'a1000001-0001-4000-8000-000000000001'::uuid,
     v_instance,
@@ -43,7 +47,8 @@ begin
     '{"provider":"email","providers":["email"]}'::jsonb,
     '{"role":"student","full_name":"Riley Morgan"}'::jsonb,
     now(),
-    now()
+    now(),
+    '', '', '', ''
   );
 
   insert into auth.identities (id, user_id, identity_data, provider, provider_id, last_sign_in_at, created_at, updated_at)
@@ -62,7 +67,8 @@ begin
   -- university (articulation / registrar-style staff in RLS)
   insert into auth.users (
     id, instance_id, aud, role, email, encrypted_password,
-    email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at
+    email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at,
+    confirmation_token, email_change, email_change_token_new, recovery_token
   ) values (
     'a1000001-0001-4000-8000-000000000002'::uuid,
     v_instance,
@@ -74,7 +80,8 @@ begin
     '{"provider":"email","providers":["email"]}'::jsonb,
     '{"role":"university","full_name":"Jordan Lee"}'::jsonb,
     now(),
-    now()
+    now(),
+    '', '', '', ''
   );
 
   insert into auth.identities (id, user_id, identity_data, provider, provider_id, last_sign_in_at, created_at, updated_at)
@@ -93,7 +100,8 @@ begin
   -- coordinator
   insert into auth.users (
     id, instance_id, aud, role, email, encrypted_password,
-    email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at
+    email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at,
+    confirmation_token, email_change, email_change_token_new, recovery_token
   ) values (
     'a1000001-0001-4000-8000-000000000003'::uuid,
     v_instance,
@@ -105,7 +113,8 @@ begin
     '{"provider":"email","providers":["email"]}'::jsonb,
     '{"role":"coordinator","full_name":"Sam Rivera"}'::jsonb,
     now(),
-    now()
+    now(),
+    '', '', '', ''
   );
 
   insert into auth.identities (id, user_id, identity_data, provider, provider_id, last_sign_in_at, created_at, updated_at)
@@ -124,7 +133,8 @@ begin
   -- professor
   insert into auth.users (
     id, instance_id, aud, role, email, encrypted_password,
-    email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at
+    email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at,
+    confirmation_token, email_change, email_change_token_new, recovery_token
   ) values (
     'a1000001-0001-4000-8000-000000000004'::uuid,
     v_instance,
@@ -136,7 +146,8 @@ begin
     '{"provider":"email","providers":["email"]}'::jsonb,
     '{"role":"professor","full_name":"Dr. Avery Kim"}'::jsonb,
     now(),
-    now()
+    now(),
+    '', '', '', ''
   );
 
   insert into auth.identities (id, user_id, identity_data, provider, provider_id, last_sign_in_at, created_at, updated_at)
@@ -155,7 +166,8 @@ begin
   -- admin
   insert into auth.users (
     id, instance_id, aud, role, email, encrypted_password,
-    email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at
+    email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at,
+    confirmation_token, email_change, email_change_token_new, recovery_token
   ) values (
     'a1000001-0001-4000-8000-000000000005'::uuid,
     v_instance,
@@ -167,7 +179,8 @@ begin
     '{"provider":"email","providers":["email"]}'::jsonb,
     '{"role":"admin","full_name":"Morgan Patel"}'::jsonb,
     now(),
-    now()
+    now(),
+    '', '', '', ''
   );
 
   insert into auth.identities (id, user_id, identity_data, provider, provider_id, last_sign_in_at, created_at, updated_at)

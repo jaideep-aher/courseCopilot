@@ -134,9 +134,15 @@ export function AuthProvider({ children }) {
 
     const found = findHardcodedUser(trimmedUser, password)
     if (!found) {
+      const raw = supabaseAuthError?.message || 'Invalid username or password.'
+      const schemaErr =
+        typeof raw === 'string' &&
+        raw.toLowerCase().includes('database error querying schema')
       return {
         ok: false,
-        error: supabaseAuthError?.message || 'Invalid username or password.',
+        error: schemaErr
+          ? 'Hosted sign-in failed: demo accounts created with SQL need a one-time fix. In Supabase → SQL Editor, run the UPDATE in supabase/migrations/005_fix_auth_users_token_columns.sql (sets empty auth token fields).'
+          : raw,
       }
     }
     const allowed = found.allowedRoles

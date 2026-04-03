@@ -1,7 +1,7 @@
 """
 Pydantic models for Course Co-Pilot data structures
 """
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional, List
 from enum import Enum
 
@@ -29,7 +29,7 @@ class University(str, Enum):
 class Course(BaseModel):
     """Structured course information"""
     university: str
-    category: str
+    category: str = ""
     file_name: str
     course_title: str
     instructor_name: Optional[str] = None
@@ -45,8 +45,16 @@ class Course(BaseModel):
     # Computed/enriched fields
     course_code: Optional[str] = None
     credit_hours: Optional[int] = None
+
+    # Source reference
     source_link: Optional[str] = None
     data_source: Optional[str] = None
+
+    @field_validator("category", mode="before")
+    @classmethod
+    def category_none_to_str(cls, v):
+        """LLM/research output may omit category."""
+        return "" if v is None else str(v)
 
     class Config:
         extra = "allow"
@@ -57,8 +65,8 @@ class CourseSummary(BaseModel):
     course_id: str  # Unique identifier (file_name or course_code)
     course_title: str
     university: str
-    category: str
-    
+    category: str = ""
+
     # Structured summary fields
     main_topics: List[str] = Field(default_factory=list)
     learning_outcomes: List[str] = Field(default_factory=list)
@@ -68,16 +76,23 @@ class CourseSummary(BaseModel):
     
     # Raw summary text
     summary_text: str = ""
+
+    # Additional metadata
     course_code: str = ""
     prerequisites: str = ""
     source_link: Optional[str] = None
-
+    
     # Completeness flags
     has_description: bool = False
     has_learning_outcomes: bool = False
     has_prerequisites: bool = False
     has_textbooks: bool = False
     missing_fields: List[str] = Field(default_factory=list)
+
+    @field_validator("category", mode="before")
+    @classmethod
+    def category_none_to_str(cls, v):
+        return "" if v is None else str(v)
 
 
 class SimilarityMatch(BaseModel):

@@ -1,7 +1,16 @@
 import axios from 'axios';
+import { TRANSCRIPT_EVAL_TIMEOUT_MS } from '../constants/timeouts';
 
-// Production split deploy: set VITE_API_URL to the API origin. Dev uses Vite /api proxy.
-const API_BASE = import.meta.env.VITE_API_URL || '/api';
+/**
+ * Split deploy: set VITE_API_URL to the API origin. Dev uses /api (Vite proxy).
+ * Strip trailing slashes so paths never become //pipeline/... (404).
+ */
+function normalizeApiBase(raw) {
+  if (raw == null || String(raw).trim() === '') return '/api'
+  return String(raw).trim().replace(/\/+$/, '')
+}
+
+const API_BASE = normalizeApiBase(import.meta.env.VITE_API_URL)
 
 const api = axios.create({
   baseURL: API_BASE,
@@ -47,7 +56,7 @@ export const evaluateTranscript = (file, targetUniversity = 'Duke') => {
   formData.append('target_university', targetUniversity);
   return api.post('/pipeline/transcript-evaluate', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
-    timeout: 300000,
+    timeout: TRANSCRIPT_EVAL_TIMEOUT_MS,
   }).then((r) => r.data);
 };
 

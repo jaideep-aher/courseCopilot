@@ -36,16 +36,42 @@ async function fetchProfileRow(userId) {
   return data ?? null
 }
 
-/** Session must be visible to PostgREST before RLS can evaluate auth.uid() on profiles. */
-async function fetchProfileAfterSignIn(userId) {
-  if (!supabase) return null
-  await supabase.auth.getSession()
-  let profile = await fetchProfileRow(userId)
-  if (!profile) {
-    await new Promise((r) => setTimeout(r, 200))
-    profile = await fetchProfileRow(userId)
+function normalizeRpcProfile(data) {
+  if (!data || typeof data !== 'object') return null
+  const role = data.role
+  if (role == null || role === '') return null
+  return {
+    role,
+    display_name: data.display_name ?? null,
+    email: data.email ?? null,
   }
-  return profile
+}
+
+/**
+ * Load profile after we have a session. Prefer RPC (007_get_my_profile_rpc.sql) so RLS/JWT
+ * timing cannot hide the row; fall back to table select.
+ */
+async function loadProfileWithSession(session) {
+  if (!supabase || !session?.access_token || !session?.refresh_token || !session?.user) return null
+
+  const { error: setErr } = await supabase.auth.setSession({
+    access_token: session.access_token,
+    refresh_token: session.refresh_token,
+  })
+  if (setErr && import.meta.env.DEV) console.warn('[auth] setSession', setErr.message)
+
+  const { data: rpcData, error: rpcErr } = await supabase.rpc('get_my_profile')
+  if (rpcErr && import.meta.env.DEV) console.warn('[auth] get_my_profile rpc', rpcErr.message)
+  const fromRpc = normalizeRpcProfile(rpcData)
+  if (fromRpc) return fromRpc
+
+  await supabase.auth.getSession()
+  let row = await fetchProfileRow(session.user.id)
+  if (!row) {
+    await new Promise((r) => setTimeout(r, 400))
+    row = await fetchProfileRow(session.user.id)
+  }
+  return row
 }
 
 function userFromSupabaseSession(authUser, profile) {
@@ -80,7 +106,7 @@ export function AuthProvider({ children }) {
         if (!cancelled) setUser(null)
         return
       }
-      const profile = await fetchProfileAfterSignIn(session.user.id)
+      const profile = await loadProfileWithSession(session)
       if (cancelled) return
       if (!profile || !isValidRole(profile.role)) {
         setUser(null)
@@ -120,30 +146,35 @@ export function AuthProvider({ children }) {
       })
       supabaseAuthError = error
       if (!error && data?.user) {
-        const profile = await fetchProfileAfterSignIn(data.user.id)
-        if (!profile) {
-          await supabase.auth.signOut()
-          return {
-            ok: false,
-            error:
-              'Account exists but has no profile row (or it could not be loaded yet). In Supabase → SQL Editor, run supabase/migrations/006_ensure_seed_profiles.sql to upsert demo profiles, then try again.',
+        const session = data.session ?? (await supabase.auth.getSession()).data.session
+        if (!session) {
+          supabaseAuthError = { message: 'No session returned after sign-in.' }
+        } else {
+          const profile = await loadProfileWithSession(session)
+          if (!profile) {
+            await supabase.auth.signOut()
+            return {
+              ok: false,
+              error:
+                'Could not load your profile after sign-in. In Supabase → SQL, run 007_get_my_profile_rpc.sql (recommended) and ensure 006_ensure_seed_profiles.sql has been applied.',
+            }
           }
-        }
-        if (!isValidRole(profile.role)) {
-          await supabase.auth.signOut()
-          return { ok: false, error: `Unknown role "${profile.role}" in profile.` }
-        }
-        if (profile.role !== role) {
-          await supabase.auth.signOut()
-          const label = ROLE_META[profile.role]?.shortLabel ?? profile.role
-          return {
-            ok: false,
-            error: `This account is for “${label}”. Choose that portal tab above, then sign in again.`,
+          if (!isValidRole(profile.role)) {
+            await supabase.auth.signOut()
+            return { ok: false, error: `Unknown role "${profile.role}" in profile.` }
           }
+          if (profile.role !== role) {
+            await supabase.auth.signOut()
+            const label = ROLE_META[profile.role]?.shortLabel ?? profile.role
+            return {
+              ok: false,
+              error: `This account is for “${label}”. Choose that portal tab above, then sign in again.`,
+            }
+          }
+          const sessionUser = userFromSupabaseSession(data.user, profile)
+          setUser(sessionUser)
+          return { ok: true, role: sessionUser.role }
         }
-        const sessionUser = userFromSupabaseSession(data.user, profile)
-        setUser(sessionUser)
-        return { ok: true, role: sessionUser.role }
       }
       // Allow hardcoded demo users when Supabase env is set but email is not a cloud account
     }

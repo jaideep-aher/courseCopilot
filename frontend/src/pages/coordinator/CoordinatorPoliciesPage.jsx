@@ -14,7 +14,7 @@ const bullets = [
   'Treat model output as advisory; maintain institutional articulation authority.',
   'Document exceptions in your SIS or articulation system — this UI does not yet persist decisions.',
   'Align target university strings with catalog data to avoid empty match results.',
-  'When policy content is stored in your database, text and approval chains can be versioned per institution.',
+  'When policy content is stored in your systems of record, text and approval chains can be versioned per institution.',
 ]
 
 export default function CoordinatorPoliciesPage() {

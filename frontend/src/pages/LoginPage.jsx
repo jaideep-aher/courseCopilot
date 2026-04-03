@@ -162,7 +162,7 @@ export default function LoginPage() {
             <div className="mt-10 pt-8 border-t border-[var(--cc-separator)]">
               <p className="text-[13px] font-medium text-[var(--cc-label)] mb-1">Team test accounts</p>
               <p className="cc-footnote mb-5">
-                For environments with seeded database users: shared password{' '}
+                For environments with seeded test accounts: shared password{' '}
                 <span className="font-mono text-[var(--cc-label)]">{SUPABASE_SEED_DEMO_PASSWORD}</span>. Choose the
                 matching portal tab, then pick a row below.
               </p>

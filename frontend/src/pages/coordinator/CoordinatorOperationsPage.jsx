@@ -53,21 +53,17 @@ export default function CoordinatorOperationsPage() {
     <PageContainer
       wide
       title="Operations dashboard"
-      subtitle={
-        isSupabaseConfigured
-          ? 'Volume and pipeline state across stored student evaluation runs.'
-          : 'Volume and pipeline state across stored evaluations once cloud storage is connected for this deployment.'
-      }
+      subtitle="Volume and pipeline state across stored student evaluation runs."
       breadcrumbs={[{ to: '/coordinator', label: 'University' }, { label: 'Operations' }]}
     >
       <StakeholderNav items={navItems} />
 
       {!isSupabaseConfigured && (
         <div className="cc-card p-8 mb-8 border border-[#ff9500]/30 bg-[rgba(255,149,0,0.06)]">
-          <p className="font-medium text-[var(--cc-label)]">Cloud storage not connected</p>
+          <p className="font-medium text-[var(--cc-label)]">Evaluation data unavailable in this build</p>
           <p className="cc-footnote mt-2">
-            Add your project&apos;s cloud URL and anonymous key to the frontend build environment and redeploy. Your
-            team&apos;s database schema must already be applied on the server side.
+            The live site needs its online connection variables set when the app is built. If your team already did that,
+            redeploy the frontend; otherwise ask whoever hosts the app to add them and ship a new build.
           </p>
         </div>
       )}

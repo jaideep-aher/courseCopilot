@@ -3,12 +3,19 @@ import PageContainer from '../../components/layout/PageContainer'
 import StakeholderNav from '../../components/stakeholders/StakeholderNav'
 
 const navItems = [
-  { to: '/professor', label: 'Overview', end: true },
+  { to: '/professor', label: 'Faculty', end: true },
+  { to: '/professor/reviews', label: 'Evaluation reviews' },
   { to: '/professor/syllabus-tips', label: 'Syllabus tips' },
   { to: '/professor/contact-coordinator', label: 'Contact coordinator' },
 ]
 
 const tools = [
+  {
+    to: '/professor/reviews',
+    title: 'Evaluation reviews',
+    desc: 'Approve or reject student evaluation runs when cloud storage is enabled.',
+    live: true,
+  },
   {
     to: '/match',
     title: 'Custom syllabus match',
@@ -33,7 +40,7 @@ export default function ProfessorHomePage() {
   return (
     <PageContainer
       title="Faculty workspace"
-      subtitle="Help students and coordinators with clear syllabus data. Live tools use your API; tips and contact flows are static until messaging is wired to Supabase."
+      subtitle="Help students and coordinators with clear syllabus data. Live tools use your API; tips and contact flows stay static until messaging is wired in."
       breadcrumbs={[{ label: 'Faculty' }]}
     >
       <StakeholderNav items={navItems} />

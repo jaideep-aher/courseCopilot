@@ -2,7 +2,7 @@ import PageContainer from '../../components/layout/PageContainer'
 import StakeholderNav from '../../components/stakeholders/StakeholderNav'
 
 const navItems = [
-  { to: '/student', label: 'Transcript', end: true },
+  { to: '/student', label: 'Dashboard', end: true },
   { to: '/student/getting-started', label: 'Getting started' },
   { to: '/student/faq', label: 'FAQ' },
 ]
@@ -18,7 +18,7 @@ const faqs = [
   },
   {
     q: 'Where will my saved data go?',
-    a: 'Right now nothing is stored in a cloud database. A future Supabase integration will hold profiles, applications, and history securely.',
+    a: 'On deployments without cloud storage, history may stay in your browser only. With cloud sign-in enabled, your school can store profiles and evaluation history according to their policy.',
   },
 ]
 

@@ -75,7 +75,13 @@ export default function useTranscriptEval() {
       }
 
       try {
-        setProgress({ stage: 'parsing', current: 0, total: 0, message: 'Processing (no live progress)...' })
+        setProgress({
+          stage: '__fallback__',
+          current: 0,
+          total: 0,
+          message:
+            'Live progress unavailable — running full evaluation in the background (this may take several minutes).',
+        })
         const res = await api.post('/pipeline/transcript-evaluate', formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
           timeout: TRANSCRIPT_EVAL_TIMEOUT_MS,

@@ -1,8 +1,8 @@
 /**
- * Stakeholder roles (static demo — will map to Supabase roles later).
+ * Stakeholder roles (demo usernames and cloud profiles both use these ids).
  * coordinator = university / articulation staff (evaluators). admin = ops / IT-style access.
  */
-export const ROLE_IDS = ['student', 'coordinator', 'professor', 'admin']
+export const ROLE_IDS = ['student', 'university', 'coordinator', 'professor', 'admin']
 
 export const ROLE_META = {
   student: {
@@ -13,12 +13,20 @@ export const ROLE_META = {
     loginSubtitle: 'Sign in to your student workspace.',
     homePath: '/student',
   },
+  university: {
+    id: 'university',
+    label: 'University (registrar)',
+    shortLabel: 'University',
+    description: 'Same evaluator tools as coordinators — articulation, deadlines, and evaluation log (RLS role university).',
+    loginSubtitle: 'Sign in as university / registrar staff.',
+    homePath: '/coordinator',
+  },
   coordinator: {
     id: 'coordinator',
-    label: 'University staff',
-    shortLabel: 'University',
+    label: 'Coordinator',
+    shortLabel: 'Coordinator',
     description: 'Dashboard, batch runs, syllabus matching, and coordinator queue — articulation / evaluator tools.',
-    loginSubtitle: 'Sign in as university staff (evaluator).',
+    loginSubtitle: 'Sign in as articulation coordinator.',
     homePath: '/coordinator',
   },
   professor: {

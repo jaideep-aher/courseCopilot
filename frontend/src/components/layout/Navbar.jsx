@@ -10,7 +10,7 @@ function buildNavItems(role, roleHomePath) {
 
   if (role === 'student') {
     return [
-      { to: roleHomePath, label: 'Transcript', end: true },
+      { to: roleHomePath, label: 'Dashboard', end: true },
       { to: '/student/quick-match', label: 'Quick match' },
       { to: '/student/catalog', label: 'Catalog' },
       { to: '/student/resources', label: 'Help' },
@@ -19,6 +19,7 @@ function buildNavItems(role, roleHomePath) {
   if (role === 'professor') {
     return [
       { to: roleHomePath, label: 'Faculty', end: true },
+      { to: '/professor/reviews', label: 'Reviews' },
       { to: '/match', label: 'Syllabus' },
       { to: '/professor/catalog', label: 'Catalog' },
       { to: '/professor/quick-match', label: 'Quick match' },
@@ -29,6 +30,9 @@ function buildNavItems(role, roleHomePath) {
   if (role === 'admin') {
     return [
       { to: roleHomePath, label: 'Admin', end: true },
+      { to: '/coordinator/operations', label: 'Ops' },
+      { to: '/coordinator/students', label: 'Evaluations' },
+      { to: '/coordinator/deadlines', label: 'Deadlines' },
       { to: '/dashboard', label: 'Dashboard' },
       { to: '/batch', label: 'Batch' },
       { to: '/courses', label: 'Catalog' },
@@ -37,9 +41,12 @@ function buildNavItems(role, roleHomePath) {
       resources,
     ]
   }
-  // coordinator (university / evaluator)
+  // coordinator + university (same surfaces; RLS distinguishes roles)
   return [
     { to: roleHomePath, label: 'University', end: true },
+    { to: '/coordinator/operations', label: 'Ops' },
+    { to: '/coordinator/students', label: 'Evaluations' },
+    { to: '/coordinator/deadlines', label: 'Deadlines' },
     { to: '/dashboard', label: 'Dashboard' },
     { to: '/batch', label: 'Batch' },
     { to: '/courses', label: 'Catalog' },

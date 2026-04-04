@@ -14,7 +14,7 @@ export function isPathAllowedForRole(role, pathname) {
     return false
   }
 
-  if (role === 'coordinator' || role === 'admin') {
+  if (role === 'coordinator' || role === 'university' || role === 'admin') {
     return (
       /^\/coordinator(\/|$)/.test(p) ||
       p === '/dashboard' ||
@@ -60,7 +60,7 @@ export function isCrossPortalViolation(role, pathname) {
     )
   }
 
-  if (role === 'coordinator' || role === 'admin') {
+  if (role === 'coordinator' || role === 'university' || role === 'admin') {
     return /^\/student(\/|$)/.test(p) || /^\/professor(\/|$)/.test(p)
   }
 

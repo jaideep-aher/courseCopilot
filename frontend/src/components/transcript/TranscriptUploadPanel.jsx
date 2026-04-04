@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import FileUpload from './FileUpload'
 import ProgressTracker from './ProgressTracker'
 import ResultsDisplay from './ResultsDisplay'
@@ -13,12 +13,25 @@ export default function TranscriptUploadPanel({
   showHowItWorksWhenIdle = true,
   variant = 'default',
   embeddedInHero = false,
+  /** Called once when pipeline returns a result (cloud or local persistence). */
+  onEvaluationComplete,
 }) {
   const workspace = variant === 'workspace'
   const [file, setFile] = useState(null)
   const [targetUniversity, setTargetUniversity] = useState('Duke')
   const [topN, setTopN] = useState(3)
   const { evaluate, result, progress, loading, error, reset } = useTranscriptEval()
+  const savedResultRef = useRef(false)
+
+  useEffect(() => {
+    if (!result) {
+      savedResultRef.current = false
+      return
+    }
+    if (!onEvaluationComplete || savedResultRef.current) return
+    savedResultRef.current = true
+    onEvaluationComplete(result, { targetUniversity })
+  }, [result, onEvaluationComplete, targetUniversity])
 
   const handleSubmit = useCallback(
     (e) => {
@@ -33,6 +46,7 @@ export default function TranscriptUploadPanel({
     setFile(null)
     setTargetUniversity('Duke')
     setTopN(3)
+    savedResultRef.current = false
     reset()
   }, [reset])
 

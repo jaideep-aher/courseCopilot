@@ -45,11 +45,20 @@ api_app = FastAPI(
     redoc_url="/redoc",
 )
 
-# CORS middleware for frontend integration
+# CORS: wildcard + credentials is invalid in browsers. Explicit origins enable credentials.
+def _cors_config():
+    raw = (settings.cors_allowed_origins or "").strip()
+    if raw:
+        origins = [o.strip() for o in raw.split(",") if o.strip()]
+        return {"allow_origins": origins, "allow_credentials": True}
+    return {"allow_origins": ["*"], "allow_credentials": False}
+
+
+_cors = _cors_config()
 api_app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Configure appropriately for production
-    allow_credentials=True,
+    allow_origins=_cors["allow_origins"],
+    allow_credentials=_cors["allow_credentials"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -112,18 +121,17 @@ async def startup_event():
     global similarity_engine, data_loader, pipeline
 
     try:
-        # Initialize similarity engine (uses local ML models)
-        similarity_engine = SimilarityEngine()
-        print("✓ In-house similarity engine initialized (no API keys required)")
-        print("✓ Using sentence-transformers + TF-IDF + knowledge-points + rule-based matching")
-
-        # Initialize OpenAI client for AI research agent
+        # Initialize OpenAI client (used for both scoring and research)
         openai_client = None
         if settings.openai_api_key:
             openai_client = openai.OpenAI(api_key=settings.openai_api_key)
-            print("✓ OpenAI client initialized for AI research agent")
+            print(f"✓ OpenAI client initialized (scoring model: {settings.scoring_model})")
         else:
-            print("  Note: OPENAI_API_KEY not set. Transcript pipeline will not work.")
+            print("  Warning: OPENAI_API_KEY not set. LLM scoring and transcript pipeline will not work.")
+
+        # Initialize similarity engine (LLM-based scoring)
+        similarity_engine = SimilarityEngine(openai_client)
+        print("✓ LLM similarity engine initialized")
 
         # Initialize on-demand pipeline
         pipeline = TransferPipeline(similarity_engine, catalog_cache, openai_client)
@@ -683,9 +691,10 @@ async def pipeline_transcript_evaluate_stream(
     async def event_stream():
         progress_queue: asyncio.Queue = asyncio.Queue()
 
-        async def progress_callback(stage, current, total, message):
+        async def progress_callback(agent, stage, current, total, message):
             await progress_queue.put({
                 "type": "progress",
+                "agent": agent,
                 "stage": stage,
                 "current": current,
                 "total": total,

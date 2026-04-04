@@ -3,21 +3,24 @@ import PageContainer from '../../components/layout/PageContainer'
 import StakeholderNav from '../../components/stakeholders/StakeholderNav'
 
 const navItems = [
-  { to: '/coordinator', label: 'Overview', end: true },
+  { to: '/coordinator', label: 'University', end: true },
+  { to: '/coordinator/operations', label: 'Operations' },
+  { to: '/coordinator/students', label: 'Evaluations' },
+  { to: '/coordinator/deadlines', label: 'Deadlines' },
   { to: '/coordinator/review-queue', label: 'Review queue' },
   { to: '/coordinator/policies', label: 'Policies' },
 ]
 
 const placeholderRows = [
   { id: '—', student: 'Pending integration', course: '—', status: 'Static placeholder' },
-  { id: '—', student: 'Supabase will populate', course: '—', status: '—' },
+  { id: '—', student: 'Live data later', course: '—', status: '—' },
 ]
 
 export default function CoordinatorReviewQueuePage() {
   return (
     <PageContainer
       title="Review queue"
-      subtitle="This table is static. Connect Supabase to show real pending evaluations and assignments."
+      subtitle="Placeholder queue — use Evaluations and Operations for live student runs today."
       breadcrumbs={[
         { to: '/coordinator', label: 'University' },
         { label: 'Review queue' },
@@ -49,8 +52,8 @@ export default function CoordinatorReviewQueuePage() {
       </div>
 
       <p className="cc-footnote mb-6">
-        Until the database exists, use <Link className="cc-link" to="/batch">batch evaluation</Link> and{' '}
-        <Link className="cc-link" to="/dashboard">dashboard</Link> for real workload on the current CSV-backed API.
+        For live workload on the catalog-backed API, use <Link className="cc-link" to="/batch">batch evaluation</Link> and{' '}
+        <Link className="cc-link" to="/dashboard">dashboard</Link>.
       </p>
     </PageContainer>
   )

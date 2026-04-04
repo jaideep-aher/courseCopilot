@@ -14,13 +14,18 @@ import ResourcesPage from './pages/ResourcesPage'
 import StudentResourcesPage from './pages/student/StudentResourcesPage'
 import ProfessorResourcesPage from './pages/professor/ProfessorResourcesPage'
 import LoginPage from './pages/LoginPage'
+import StudentSignupPage from './pages/StudentSignupPage'
 import StudentHomePage from './pages/student/StudentHomePage'
 import StudentGettingStartedPage from './pages/student/StudentGettingStartedPage'
 import StudentFaqPage from './pages/student/StudentFaqPage'
 import CoordinatorHomePage from './pages/coordinator/CoordinatorHomePage'
+import CoordinatorOperationsPage from './pages/coordinator/CoordinatorOperationsPage'
+import CoordinatorStudentsPage from './pages/coordinator/CoordinatorStudentsPage'
+import CoordinatorDeadlinesPage from './pages/coordinator/CoordinatorDeadlinesPage'
 import CoordinatorReviewQueuePage from './pages/coordinator/CoordinatorReviewQueuePage'
 import CoordinatorPoliciesPage from './pages/coordinator/CoordinatorPoliciesPage'
 import ProfessorHomePage from './pages/professor/ProfessorHomePage'
+import ProfessorFacultyReviewsPage from './pages/professor/ProfessorFacultyReviewsPage'
 import ProfessorSyllabusTipsPage from './pages/professor/ProfessorSyllabusTipsPage'
 import ProfessorContactPage from './pages/professor/ProfessorContactPage'
 
@@ -48,6 +53,7 @@ export default function App() {
     <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/signup" element={<StudentSignupPage />} />
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
           <Route element={<RoleAccessGuard />}>
@@ -56,9 +62,13 @@ export default function App() {
             <Route path="/student/getting-started" element={<StudentGettingStartedPage />} />
             <Route path="/student/faq" element={<StudentFaqPage />} />
             <Route path="/coordinator" element={<CoordinatorHomePage />} />
+            <Route path="/coordinator/operations" element={<CoordinatorOperationsPage />} />
+            <Route path="/coordinator/students" element={<CoordinatorStudentsPage />} />
+            <Route path="/coordinator/deadlines" element={<CoordinatorDeadlinesPage />} />
             <Route path="/coordinator/review-queue" element={<CoordinatorReviewQueuePage />} />
             <Route path="/coordinator/policies" element={<CoordinatorPoliciesPage />} />
             <Route path="/professor" element={<ProfessorHomePage />} />
+            <Route path="/professor/reviews" element={<ProfessorFacultyReviewsPage />} />
             <Route path="/professor/syllabus-tips" element={<ProfessorSyllabusTipsPage />} />
             <Route path="/professor/contact-coordinator" element={<ProfessorContactPage />} />
             <Route path="/dashboard" element={<DashboardPage />} />

@@ -3,7 +3,7 @@ import PageContainer from '../../components/layout/PageContainer'
 import StakeholderNav from '../../components/stakeholders/StakeholderNav'
 
 const navItems = [
-  { to: '/student', label: 'Transcript', end: true },
+  { to: '/student', label: 'Dashboard', end: true },
   { to: '/student/getting-started', label: 'Getting started' },
   { to: '/student/faq', label: 'FAQ' },
 ]
@@ -11,9 +11,9 @@ const navItems = [
 const steps = [
   {
     title: 'Transcript + agent pipeline',
-    body: 'Your main flow is on the Transcript tab: PDF upload, live research stages, and match results.',
+    body: 'Your main flow is on the Dashboard: PDF upload, live research stages, and match results.',
     to: '/student',
-    cta: 'Go to transcript',
+    cta: 'Open dashboard',
   },
   {
     title: 'One course at a time',

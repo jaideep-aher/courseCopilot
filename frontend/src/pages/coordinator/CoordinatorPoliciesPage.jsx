@@ -2,7 +2,10 @@ import PageContainer from '../../components/layout/PageContainer'
 import StakeholderNav from '../../components/stakeholders/StakeholderNav'
 
 const navItems = [
-  { to: '/coordinator', label: 'Overview', end: true },
+  { to: '/coordinator', label: 'University', end: true },
+  { to: '/coordinator/operations', label: 'Operations' },
+  { to: '/coordinator/students', label: 'Evaluations' },
+  { to: '/coordinator/deadlines', label: 'Deadlines' },
   { to: '/coordinator/review-queue', label: 'Review queue' },
   { to: '/coordinator/policies', label: 'Policies' },
 ]
@@ -11,7 +14,7 @@ const bullets = [
   'Treat model output as advisory; maintain institutional articulation authority.',
   'Document exceptions in your SIS or articulation system — this UI does not yet persist decisions.',
   'Align target university strings with catalog data to avoid empty match results.',
-  'When Supabase is connected, policy text and approval chains can be versioned per institution.',
+  'When policy content is stored in your systems of record, text and approval chains can be versioned per institution.',
 ]
 
 export default function CoordinatorPoliciesPage() {

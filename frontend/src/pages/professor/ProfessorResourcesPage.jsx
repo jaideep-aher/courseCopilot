@@ -4,6 +4,7 @@ import StakeholderNav from '../../components/stakeholders/StakeholderNav'
 
 const navItems = [
   { to: '/professor', label: 'Faculty', end: true },
+  { to: '/professor/reviews', label: 'Evaluation reviews' },
   { to: '/professor/syllabus-tips', label: 'Syllabus tips' },
   { to: '/professor/contact-coordinator', label: 'Contact' },
 ]

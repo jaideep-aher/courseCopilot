@@ -4,6 +4,8 @@ import { useAuth } from '../auth/AuthContext'
 import { HARDCODED_USERS, DEMO_PASSWORD } from '../auth/hardcodedUsers'
 import { ROLE_IDS, ROLE_META, defaultPathForRole, parseRoleParam } from '../auth/roles'
 import { isPathAllowedForRole } from '../auth/routeAccess'
+import { isSupabaseConfigured } from '../lib/supabaseClient'
+import { SUPABASE_SEED_ACCOUNTS, SUPABASE_SEED_DEMO_PASSWORD } from '../auth/supabaseSeedInfo'
 
 export default function LoginPage() {
   const { login, user, ready } = useAuth()
@@ -13,8 +15,12 @@ export default function LoginPage() {
 
   const from = location.state?.from?.pathname
   const [role, setRole] = useState(() => parseRoleParam(searchParams.get('role')))
-  const [username, setUsername] = useState('username')
-  const [password, setPassword] = useState('password')
+  const [username, setUsername] = useState(() =>
+    isSupabaseConfigured ? '' : 'username',
+  )
+  const [password, setPassword] = useState(() =>
+    isSupabaseConfigured ? '' : 'password',
+  )
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -29,18 +35,26 @@ export default function LoginPage() {
     navigate(safeFrom, { replace: true })
   }, [ready, user, navigate, from])
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
-    const result = login(username, password, role)
+    const result = await login(username, password, role)
     if (!result.ok) setError(result.error)
   }
 
-  const quickSignIn = (u) => {
+  const quickSignIn = async (u) => {
     setUsername(u.username)
     setPassword(DEMO_PASSWORD)
     setError('')
-    const result = login(u.username, DEMO_PASSWORD, role)
+    const result = await login(u.username, DEMO_PASSWORD, role)
+    if (!result.ok) setError(result.error)
+  }
+
+  const quickSeedSignIn = async (email) => {
+    setUsername(email)
+    setPassword(SUPABASE_SEED_DEMO_PASSWORD)
+    setError('')
+    const result = await login(email, SUPABASE_SEED_DEMO_PASSWORD, role)
     if (!result.ok) setError(result.error)
   }
 
@@ -96,11 +110,11 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="login-username" className="block text-[13px] font-medium text-[var(--cc-label-secondary)] mb-2">
-                Username
+                {isSupabaseConfigured ? 'Email' : 'Username'}
               </label>
               <input
                 id="login-username"
-                type="text"
+                type={isSupabaseConfigured ? 'email' : 'text'}
                 autoComplete="username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
@@ -136,12 +150,48 @@ export default function LoginPage() {
             </button>
           </form>
 
+          {role === 'student' && isSupabaseConfigured && (
+            <p className="text-center mt-6">
+              <Link to="/signup" className="cc-link text-[15px]">
+                Create student account
+              </Link>
+            </p>
+          )}
+
+          {isSupabaseConfigured && (
+            <div className="mt-10 pt-8 border-t border-[var(--cc-separator)]">
+              <p className="text-[13px] font-medium text-[var(--cc-label)] mb-1">Team test accounts</p>
+              <p className="cc-footnote mb-5">
+                For environments with seeded test accounts: shared password{' '}
+                <span className="font-mono text-[var(--cc-label)]">{SUPABASE_SEED_DEMO_PASSWORD}</span>. Choose the
+                matching portal tab, then pick a row below.
+              </p>
+              <ul className="space-y-2">
+                {SUPABASE_SEED_ACCOUNTS.filter((a) => a.role === role).map((a) => (
+                  <li key={a.email}>
+                    <button
+                      type="button"
+                      onClick={() => quickSeedSignIn(a.email)}
+                      className="w-full flex items-center justify-between gap-3 rounded-[var(--cc-radius-md)] px-4 py-3.5 text-left transition-colors hover:bg-[var(--cc-fill)]"
+                    >
+                      <span className="font-medium text-[15px] text-[var(--cc-label)]">{a.label}</span>
+                      <span className="text-[12px] font-mono text-[var(--cc-label-secondary)] truncate max-w-[55%]">
+                        {a.email}
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           <div className="mt-10 pt-8 border-t border-[var(--cc-separator)]">
-            <p className="text-[13px] font-medium text-[var(--cc-label)] mb-1">Demo accounts</p>
+            <p className="text-[13px] font-medium text-[var(--cc-label)] mb-1">Local demo accounts</p>
             <p className="cc-footnote mb-5">
               Password for all: <span className="font-mono text-[var(--cc-label)]">{DEMO_PASSWORD}</span>.{' '}
-              <span className="font-mono">username</span> works with <strong>any</strong> portal tab; evaluator, student,
-              faculty, and admin demo accounts only work when that matching role is selected above.
+              <span className="font-mono">username</span> works with <strong>any</strong> portal tab; other demo users
+              only work when that matching role is selected above. These still work if your email is not a registered
+              cloud account.
             </p>
             <ul className="space-y-2">
               {HARDCODED_USERS.map((u) => (
@@ -160,10 +210,15 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <p className="text-center mt-8">
+        <p className="text-center mt-8 flex flex-col sm:flex-row gap-3 justify-center items-center">
           <Link to="/" className="cc-link text-[15px]">
             Stakeholder home
           </Link>
+          {isSupabaseConfigured && (
+            <Link to="/signup" className="cc-link text-[15px]">
+              New student signup
+            </Link>
+          )}
         </p>
       </div>
     </div>

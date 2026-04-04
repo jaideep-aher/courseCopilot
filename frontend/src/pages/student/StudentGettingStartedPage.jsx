@@ -3,7 +3,7 @@ import StakeholderNav from '../../components/stakeholders/StakeholderNav'
 import { Link } from 'react-router-dom'
 
 const navItems = [
-  { to: '/student', label: 'Transcript', end: true },
+  { to: '/student', label: 'Dashboard', end: true },
   { to: '/student/getting-started', label: 'Getting started' },
   { to: '/student/faq', label: 'FAQ' },
 ]
@@ -23,7 +23,7 @@ const steps = [
   },
   {
     title: 'Talk to your coordinator',
-    body: 'Scores are decision-support only. Final articulation stays with your institution; messaging will connect here after Supabase.',
+    body: 'Scores are decision-support only. Final articulation stays with your institution; messaging can connect here when your school enables it.',
   },
 ]
 

@@ -71,11 +71,7 @@ export default function useTranscriptEval() {
       }
 
       if (import.meta.env.DEV) {
-        console.warn(
-          '[transcript] SSE failed, using non-streaming POST:',
-          streamErr,
-          '| Check VITE_API_URL at build time, API CORS (CORS_ALLOWED_ORIGINS), and trailing slashes.',
-        )
+        console.warn('[transcript] SSE failed, using non-streaming POST:', streamErr)
       }
 
       try {

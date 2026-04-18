@@ -1,4 +1,4 @@
-# Course Co-Pilot
+# Course Co-
 
 **AI-Powered Transfer Credit Evaluation System**
 

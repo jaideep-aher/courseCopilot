@@ -25,3 +25,5 @@ requests
 python-dotenv
 pydantic
 pydantic-settings
+
+# Python version is pinned in runtime.txt for deployment hosts.

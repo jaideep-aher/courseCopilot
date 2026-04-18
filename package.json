@@ -1,7 +1,7 @@
 {
   "name": "course-copilot",
   "private": true,
-  "description": "Scripts only; app code lives in frontend/ and api/",
+  "description": "Root scripts and tooling; application code lives in frontend/ and api/",
   "scripts": {
     "db:apply": "node scripts/apply-supabase-sql.mjs"
   },
